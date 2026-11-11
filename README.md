@@ -26,4 +26,4 @@ To publish it with GitHub Pages: Settings → Pages → Deploy from branch → `
 - Upload your own reference photos into the moodboard.
 - Write a prompt that changes the next result.
 - Play the Reel and the soundtrack (generated live in the browser).
-- Play with the price per block, remix flows, vote, and pick a team flow.
+- Play with the price per block, remix flows, vote, pick a team flow, and delete flows (with undo).

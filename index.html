@@ -302,6 +302,9 @@ textarea.prompt:focus{outline:none;border-color:var(--ink-3);box-shadow:0 0 0 3p
 .vreel{position:relative;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-2);animation:pop .25s ease both;max-width:calc(100vw - 32px)}
 .vreel .playbtn span{width:72px;height:72px}
 .toast{position:fixed;left:50%;bottom:max(20px, env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:999px;font-size:var(--fs-cap);font-weight:600;box-shadow:var(--shadow-2);max-width:calc(100vw - 32px);animation:rise .2s ease}
+.toast{display:flex;align-items:center;gap:12px}
+.toast-act{min-height:32px;margin:-6px -8px -6px 0;padding:0 12px;border:none;border-radius:999px;background:rgba(255,255,255,.16);color:inherit;font-size:var(--fs-cap);font-weight:700}
+.toast-act:hover{background:rgba(255,255,255,.26)}
 .toast.up{bottom:auto;top:calc(env(safe-area-inset-top,0px) + var(--topbar-h, 61px) + 76px)}
 
 /* coach card (quick start + full tour) */
@@ -754,7 +757,7 @@ function App(){
     });
   }
   function say(n, text){ toastKey.current += 1; n.toast = {text, key: toastKey.current}; }
-  useEffect(() => { if (!S.toast) return; const t = setTimeout(() => setS(p => p.toast && p.toast.key === S.toast.key ? Object.assign({}, p, {toast:null}) : p), 2600); return () => clearTimeout(t); }, [S.toast && S.toast.key]);
+  useEffect(() => { if (!S.toast) return; const t = setTimeout(() => setS(p => p.toast && p.toast.key === S.toast.key ? Object.assign({}, p, {toast:null}) : p), S.toast.undo ? 6000 : 2600); return () => clearTimeout(t); }, [S.toast && S.toast.key]);
   useEffect(() => { if (!S.deltaKey) return; const t = setTimeout(() => setS(p => p.deltaKey === S.deltaKey ? Object.assign({}, p, {delta:0}) : p), 1800); return () => clearTimeout(t); }, [S.deltaKey]);
   useEffect(() => () => { timers.current.forEach(clearTimeout); Audio8.stop(); }, []);
   useEffect(() => { saveSeen(S.seen); }, [S.seen.join(',')]);
@@ -812,6 +815,26 @@ function App(){
         n.flows.push({id, name, from:src.name, note:'', votes:[], blocks});
         n.flowMenu = null;
         say(n, name + ' remixed from ' + src.name);
+      });
+    },
+    deleteFlow(fid){
+      if (S.playing) Audio8.stop();
+      update(n => {
+        const idx = n.flows.findIndex(x => x.id === fid); if (idx < 0) return;
+        const f = n.flows.splice(idx, 1)[0];
+        n.undo = {flow: f, idx, kept: n.kept === fid};
+        if (n.kept === fid) n.kept = null;
+        n.flowMenu = null; n.viewer = null; n.picker = null; n.preflight = null; n.insert = null; n.playing = null;
+        say(n, f.name + ' deleted'); n.toast.undo = true;
+      });
+    },
+    undoDelete(){
+      update(n => {
+        if (!n.undo) return;
+        n.flows.splice(Math.min(n.undo.idx, n.flows.length), 0, n.undo.flow);
+        if (n.undo.kept) n.kept = n.undo.flow.id;
+        say(n, n.undo.flow.name + ' is back');
+        n.undo = null;
       });
     },
     vote(fid){ update(n => { const f = findFlow(n, fid); if (f) f.votes = f.votes.indexOf('R') >= 0 ? f.votes.filter(x => x !== 'R') : f.votes.concat(['R']); n.flowMenu = null; }); },
@@ -907,6 +930,7 @@ function App(){
       </div>
 
       <div className="flows">
+        ${S.flows.length === 0 ? html`<div className="flow" style=${{alignItems:'center',textAlign:'center',padding:'40px 20px'}}><p style=${{margin:0}}>No flows yet. Start one to plan your campaign.</p><button className="btn btn-primary" onClick=${A.newFlow}>Start a flow</button></div>` : null}
         ${S.flows.slice().reverse().map(f => html`<${Flow} key=${f.id} f=${f} S=${S} A=${A} dnd=${dnd} $=${$} isTop=${f.id === topId} hint=${f.id === topId ? hint : null}/>`)}
       </div>
     </section>
@@ -920,7 +944,7 @@ function App(){
     ${S.settingsOpen ? html`<${Settings} S=${S} A=${A} startTour=${startTour} startQuick=${startQuick} close=${() => A.set({settingsOpen:false})}/>` : null}
     ${S.qs != null ? html`<${QuickStart} S=${S} A=${A} $=${$} startTour=${startTour}/>` : null}
     ${S.tour != null ? html`<${Tour} S=${S} setS=${setS} A=${A}/>` : null}
-    ${S.toast ? html`<div key=${S.toast.key} className=${'toast' + (S.tour != null || S.qs != null ? ' up' : '')} role="status">${S.toast.text}</div>` : null}
+    ${S.toast ? html`<div key=${S.toast.key} className=${'toast' + (S.tour != null || S.qs != null ? ' up' : '')} role="status">${S.toast.text}${S.toast.undo && S.undo ? html`<button className="toast-act" onClick=${A.undoDelete}>Undo</button>` : null}</div>` : null}
   `;
 }
 
@@ -1442,7 +1466,7 @@ function FlowMenu({S, A, close}){
   const m = S.flowMenu; const f = S.flows.find(x => x.id === m.fid); if (!f) return null;
   const voted = f.votes.indexOf('R') >= 0, kept = S.kept === f.id;
   const left = Math.min(Math.max(12, m.x - 248), window.innerWidth - 260);
-  const h = 160;
+  const h = 210;
   let top = m.y + 6; if (top + h > window.innerHeight - 12) top = Math.max(12, m.t - h - 6);
   return html`<${React.Fragment}>
     <button className="clickaway" aria-label="Close" onClick=${close}></button>
@@ -1450,6 +1474,7 @@ function FlowMenu({S, A, close}){
       <button role="menuitem" className="mitem" onClick=${() => A.vote(f.id)}><span className="itile"><${Icon} n="team" s=${16}/></span><span className="n">${voted ? 'Remove my vote' : 'Vote for this flow'}</span></button>
       <button role="menuitem" className="mitem" onClick=${() => A.keep(f.id)}><span className="itile"><${Icon} n="star" s=${16} fill=${kept ? 'currentColor' : 'none'}/></span><span className="n">${kept ? 'Unpick' : 'Pick as team flow'}</span></button>
       <button role="menuitem" className="mitem" onClick=${() => A.remix(f.id)}><span className="itile"><${Icon} n="remix" s=${16}/></span><span className="n">Remix</span></button>
+      <button role="menuitem" className="mitem" onClick=${() => A.deleteFlow(f.id)}><span className="itile"><${Icon} n="x" s=${16}/></span><span className="n">Delete flow</span></button>
     </div>
   <//>`;
 }
