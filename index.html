@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
 <meta name="description" content="Blockflow: a concept case study and clickable prototype for planning, making and pricing AI campaigns as visible flows of building blocks.">
 <title>Blockflow</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -26,26 +27,7 @@
   --fs-display:clamp(40px, 6vw, 64px); --fs-h:22px; --fs-body:16px; --fs-cap:13px;
   --r:16px; --r-ctl:12px; --tap:44px;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --canvas:#151514; --canvas-glass:rgba(21,21,20,0.9);
-  --panel:#21211F; --field:#2A2A28; --field-2:#33332F;
-  --line:#33332F; --line-2:#4A4A44;
-  --ink:#F2F2EF; --ink-2:#B9B9B2; --ink-3:#9C9C95;
-  --accent-top:#F6F6F3; --accent-bot:#E2E2DE; --accent-ring:#FFFFFF; --accent-deep:#C9C9C4; --on-accent:#1B1B1A;
-  --mask:rgba(0,0,0,0.6); --viewer:rgba(21,21,20,0.985);
-  --shadow-1:0 1px 2px rgba(0,0,0,0.4); --shadow-2:0 1px 2px rgba(0,0,0,0.4), 0 16px 40px rgba(0,0,0,0.5);
-  color-scheme:dark;
-}}
-:root[data-theme="dark"]{
-  --canvas:#151514; --canvas-glass:rgba(21,21,20,0.9);
-  --panel:#21211F; --field:#2A2A28; --field-2:#33332F;
-  --line:#33332F; --line-2:#4A4A44;
-  --ink:#F2F2EF; --ink-2:#B9B9B2; --ink-3:#9C9C95;
-  --accent-top:#F6F6F3; --accent-bot:#E2E2DE; --accent-ring:#FFFFFF; --accent-deep:#C9C9C4; --on-accent:#1B1B1A;
-  --mask:rgba(0,0,0,0.6); --viewer:rgba(21,21,20,0.985);
-  --shadow-1:0 1px 2px rgba(0,0,0,0.4); --shadow-2:0 1px 2px rgba(0,0,0,0.4), 0 16px 40px rgba(0,0,0,0.5);
-  color-scheme:dark;
-}
+:root{color-scheme:light}
 *{box-sizing:border-box}
 body{background:var(--canvas);color:var(--ink);font:var(--fs-body)/1.5 var(--font-ui);-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--canvas)}
