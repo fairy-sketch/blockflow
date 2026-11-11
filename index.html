@@ -1,0 +1,1608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Blockflow: a concept case study and clickable prototype for planning, making and pricing AI campaigns as visible flows of building blocks.">
+<title>Blockflow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700&display=swap">
+<style>
+/* Layout: a quiet design-tool canvas. White panels hold the work, colour lives only in the flowers.
+   One accent (ink) for the primary action and for progress. Type: one display (hero only), one heading, one body, one caption. */
+:root{
+  --canvas:#EDEDEB; --canvas-glass:rgba(237,237,235,0.9);
+  --panel:#FFFFFF; --field:#F4F4F2; --field-2:#E9E9E6;
+  --line:#E2E2DE; --line-2:#CDCDC8;
+  --ink:#1B1B1A; --ink-2:#55554F; --ink-3:#6E6E68;
+  --accent-top:#323232; --accent-bot:#222222; --accent-ring:#333333; --accent-deep:#121212; --on-accent:#FFFFFF;
+  --mask:rgba(27,27,26,0.42); --viewer:rgba(237,237,235,0.985);
+  --shadow-1:0 1px 2px rgba(0,0,0,0.05);
+  --shadow-2:0 1px 2px rgba(0,0,0,0.05), 0 16px 40px rgba(0,0,0,0.10);
+  --font-ui:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display:"Inter Tight", "Inter", system-ui, -apple-system, sans-serif;
+  --fs-display:clamp(40px, 6vw, 64px); --fs-h:22px; --fs-body:16px; --fs-cap:13px;
+  --r:16px; --r-ctl:12px; --tap:44px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --canvas:#151514; --canvas-glass:rgba(21,21,20,0.9);
+  --panel:#21211F; --field:#2A2A28; --field-2:#33332F;
+  --line:#33332F; --line-2:#4A4A44;
+  --ink:#F2F2EF; --ink-2:#B9B9B2; --ink-3:#9C9C95;
+  --accent-top:#F6F6F3; --accent-bot:#E2E2DE; --accent-ring:#FFFFFF; --accent-deep:#C9C9C4; --on-accent:#1B1B1A;
+  --mask:rgba(0,0,0,0.6); --viewer:rgba(21,21,20,0.985);
+  --shadow-1:0 1px 2px rgba(0,0,0,0.4); --shadow-2:0 1px 2px rgba(0,0,0,0.4), 0 16px 40px rgba(0,0,0,0.5);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --canvas:#151514; --canvas-glass:rgba(21,21,20,0.9);
+  --panel:#21211F; --field:#2A2A28; --field-2:#33332F;
+  --line:#33332F; --line-2:#4A4A44;
+  --ink:#F2F2EF; --ink-2:#B9B9B2; --ink-3:#9C9C95;
+  --accent-top:#F6F6F3; --accent-bot:#E2E2DE; --accent-ring:#FFFFFF; --accent-deep:#C9C9C4; --on-accent:#1B1B1A;
+  --mask:rgba(0,0,0,0.6); --viewer:rgba(21,21,20,0.985);
+  --shadow-1:0 1px 2px rgba(0,0,0,0.4); --shadow-2:0 1px 2px rgba(0,0,0,0.4), 0 16px 40px rgba(0,0,0,0.5);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--canvas);color:var(--ink);font:var(--fs-body)/1.5 var(--font-ui);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--canvas)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.wrap{padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+.num{font-variant-numeric:tabular-nums}
+.cap{font-size:var(--fs-cap);color:var(--ink-2);line-height:1.4}
+.h{font-size:var(--fs-h);font-weight:700;letter-spacing:-0.02em;line-height:1.2;margin:0}
+.eyebrow{font-size:var(--fs-cap);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+
+/* buttons: primary = the one accent, secondary = quiet panel, ghost = text */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--tap);padding:0 18px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--panel);font-weight:600;font-size:var(--fs-body);white-space:nowrap;color:var(--ink);text-decoration:none;transition:transform .08s ease, background .15s ease}
+.btn:hover{background:var(--field)}
+.btn:active{transform:translateY(1px)}
+.btn-primary{border:none;color:var(--on-accent);background:linear-gradient(180deg,var(--accent-top) 0%,var(--accent-bot) 100%);box-shadow:inset 0 .5px 1px rgba(255,255,255,.15), inset 0 -1px 1.2px .35px var(--accent-deep), 0 2px 4px -1px rgba(13,13,13,.5), 0 0 0 1px var(--accent-ring)}
+.btn-primary:hover{background:linear-gradient(180deg,var(--accent-top) 0%,var(--accent-top) 100%)}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-ghost:hover{background:var(--field)}
+.btn-lg{min-height:52px;padding:0 24px;border-radius:14px}
+.btn-icon{width:var(--tap);padding:0}
+.btn-wide{width:100%}
+.btn-quiet{background:var(--field);border-color:transparent;color:var(--ink-2)}
+.btn:disabled{opacity:1;background:var(--field);color:var(--ink-3);border:1px dashed var(--line-2);box-shadow:none;transform:none}
+.linkbtn{background:none;border:none;padding:0 4px;min-height:var(--tap);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.linkbtn:hover{color:var(--ink)}
+
+/* top bar: brand, two links, settings. No numbers here. */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--canvas-glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topbar-in{display:flex;align-items:center;gap:8px 16px;min-height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-0.02em;color:var(--ink);text-decoration:none;min-height:var(--tap)}
+.mark{width:28px;height:28px;border-radius:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;padding:6px;background:linear-gradient(180deg,#323232,#222222);box-shadow:0 0 0 1px #333}
+.mark span{background:#FFFFFF;border-radius:2px}.mark span:nth-child(4){opacity:.35}
+.nav{display:flex;gap:2px}
+.nav a{display:inline-flex;align-items:center;min-height:var(--tap);padding:0 12px;border-radius:10px;color:var(--ink-2);text-decoration:none;font-weight:500}
+.nav a:hover{background:var(--field);color:var(--ink)}
+.spacer{flex:1}
+
+/* landing */
+.story{max-width:1080px;margin:0 auto;padding-block:64px 32px;display:flex;flex-direction:column;gap:88px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.hero h1{font-family:var(--font-display);font-size:var(--fs-display);line-height:1.02;letter-spacing:-0.035em;margin:12px 0 16px;font-weight:700;text-wrap:balance}
+.hero .lead{font-size:19px;line-height:1.5;color:var(--ink-2);margin:0 0 28px;max-width:40ch}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.hero-art{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow-2);display:flex;flex-direction:column;gap:14px}
+.mini-row{display:flex;align-items:center;gap:6px}
+.mini-row.ghost{opacity:.4}
+.mini{flex:1;min-width:0;background:var(--field);border-radius:10px;padding:6px}
+.mini .pic{width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden}
+.mini-wire{width:10px;height:2px;background:var(--ink);border-radius:2px;flex:none}
+.mini.deck{flex:1.3;background:var(--panel);border:1px solid var(--line-2)}
+.mini.deck .pic{aspect-ratio:4/5}
+.axis{display:flex;justify-content:space-between;gap:8px}
+.sec{display:flex;flex-direction:column;gap:20px}
+.sec h2{font-family:var(--font-display);font-size:34px;letter-spacing:-0.025em;line-height:1.1;margin:0;text-wrap:balance}
+.vs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel)}
+.vs>div{padding:16px 20px;border-top:1px solid var(--line)}
+.vs>div:nth-child(odd){color:var(--ink-2);border-right:1px solid var(--line)}
+.vs>div:nth-child(even){font-weight:600}
+.vs>.th{border-top:none;background:var(--field);font-size:var(--fs-cap);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)!important}
+.quote{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:32px}
+.quote blockquote{margin:0;font-family:var(--font-display);font-size:26px;line-height:1.3;letter-spacing:-0.015em;font-weight:600;text-wrap:balance}
+.quote p{margin:0;color:var(--ink-2)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h3{margin:0;font-size:var(--fs-body);font-weight:700}
+.card p{margin:0;color:var(--ink-2)}
+.ic{width:36px;height:36px;border-radius:10px;background:var(--field);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;background:var(--field);font-size:var(--fs-cap);font-weight:600;white-space:nowrap}
+.chip.ink{background:var(--ink);color:var(--panel)}
+.stackviz{display:flex;flex-direction:column;gap:6px}
+.stackviz div{min-height:36px;border-radius:10px;background:var(--field);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:var(--fs-cap);font-weight:600}
+.stackviz div:first-child{background:var(--panel);border:1px solid var(--line-2)}
+.stackviz div:nth-child(3){opacity:.55}
+.band{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px}
+
+/* playground */
+.play{padding-block:28px 96px;display:flex;flex-direction:column;gap:16px;scroll-margin-top:60px}
+.play-head{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;justify-content:space-between}
+.bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--topbar-h, 61px));z-index:20;display:flex;align-items:center;gap:8px;background:var(--canvas-glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding-block:10px;border-bottom:1px solid var(--line);margin-inline:calc(-1 * max(16px, env(safe-area-inset-left,0px)));padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+.blocks-bar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0;padding:2px}
+.blocks-bar::-webkit-scrollbar{display:none}
+.pchip{flex:none;display:flex;align-items:center;gap:8px;min-height:var(--tap);padding:0 14px 0 6px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--panel);font-weight:600;cursor:grab;user-select:none;-webkit-user-select:none}
+.pchip:hover{border-color:var(--line-2)}
+.itile{width:32px;height:32px;border-radius:9px;background:var(--field);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+.jar{flex:none;display:flex;align-items:center;gap:10px;min-height:var(--tap);padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--panel)}
+.jar .jbar{width:96px;height:6px;border-radius:999px;background:var(--field-2);overflow:hidden;display:flex}
+.jar .fill{height:100%;background:var(--ink);transition:width .35s ease}
+.jar .plan{height:100%;background:repeating-linear-gradient(135deg,var(--ink) 0 2px,transparent 2px 5px);opacity:.45;transition:width .35s ease}
+.jar b{font-weight:600}
+.delta{font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);animation:rise .25s ease;white-space:nowrap}
+.flows{display:flex;flex-direction:column;gap:20px}
+.flow{border-radius:24px;border:1px solid var(--line);background:color-mix(in srgb, var(--panel) 40%, transparent);padding:20px;display:flex;flex-direction:column;gap:14px;animation:slide .45s cubic-bezier(.2,.8,.2,1) both}
+.flow.top{background:color-mix(in srgb, var(--panel) 65%, transparent)}
+.flow.kept{border-color:var(--ink)}
+.flow-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;min-height:var(--tap)}
+.flow-tools{display:flex;gap:6px;margin-left:auto;align-items:center}
+.voters{display:flex}
+.av{width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--canvas)}
+.av+.av{margin-left:-6px}
+.tipline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-ctl);padding:4px 4px 4px 14px;animation:rise .25s ease}
+.tipline span{flex:1;min-width:200px}
+.row-scroll{overflow-x:auto;padding:4px 2px 12px}
+.row{display:flex;align-items:flex-start;width:max-content}
+
+/* block */
+.block{width:280px;flex:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-1);display:flex;flex-direction:column;gap:14px;padding:16px;animation:snap .35s ease both}
+.block.busy{border-color:var(--ink)}
+.bhead{display:flex;align-items:center;gap:10px}
+.bhead .t{font-weight:700;line-height:1.2}
+.bhead .tt{flex:1;min-width:0;display:flex;flex-direction:column}
+.bhead .tt .cap{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xbtn{width:var(--tap);height:var(--tap);margin:-10px -10px -10px 0;border:none;background:transparent;color:var(--ink-3);display:flex;align-items:center;justify-content:center;border-radius:10px;flex:none;opacity:.6}
+.xbtn:hover{opacity:1;background:var(--field);color:var(--ink)}
+.model{display:flex;align-items:center;gap:6px;min-height:var(--tap);padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--field);width:100%;text-align:left;font-size:var(--fs-cap)}
+.model:hover{border-color:var(--line-2)}
+.model b{font-weight:600;color:var(--ink);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.model span{color:var(--ink-2)}
+.ctl-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--field)}
+.stepper button{width:var(--tap);height:var(--tap);border:none;background:transparent;font-size:20px;line-height:1;border-radius:var(--r-ctl)}
+.stepper button:hover{background:var(--field-2)}
+.stepper .v{min-width:24px;text-align:center;font-weight:600}
+.seg{display:flex;background:var(--field-2);border-radius:var(--r-ctl);padding:3px;gap:3px}
+.seg button{flex:1;white-space:nowrap;min-height:38px;border:none;border-radius:9px;background:transparent;font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);padding:0 10px}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.tiles{display:grid;grid-template-columns:repeat(5,44px);gap:5px}
+.tile{position:relative;width:44px;height:44px;padding:0;border:none;border-radius:8px;overflow:hidden;background:transparent}
+.tile.tall{height:55px}
+.tile.ghost{border:1.5px dashed var(--line-2)}
+.tile.ghost.busy,.ghost.busy{animation:shimmer .9s ease infinite}
+.tile.in{animation:pop .35s ease both}
+.tile.liked{outline:2.5px solid var(--ink);outline-offset:2px}
+.zoomable{cursor:zoom-in}
+.zoomable::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .15s ease}
+.zoomable:hover::after{background:rgba(0,0,0,.08)}
+.tile svg,svg.art{display:block;width:100%;height:100%}
+.heart{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:999px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.heart svg{width:9px;height:9px}
+.refs{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ref{width:32px;height:32px;border-radius:7px;overflow:hidden;box-shadow:0 0 0 1.5px var(--line-2);flex:none}
+.ref img{width:100%;height:100%;object-fit:cover;display:block}
+.upload{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:var(--tap);padding:0 12px;border-radius:var(--r-ctl);border:1.5px dashed var(--line-2);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);cursor:pointer}
+.upload:hover{border-color:var(--ink-3);color:var(--ink)}
+.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.srow{display:flex;align-items:center;gap:6px}
+.src{width:24px;height:24px;border-radius:6px;overflow:hidden;flex:none;opacity:.8}
+.arrow{color:var(--ink-3);flex:none;display:flex}
+.pair{display:flex;align-items:center;gap:8px}
+.pair .lo{width:24px;height:30px;border-radius:5px;overflow:hidden;filter:blur(1px) saturate(.8);flex:none}
+.pair .hi{position:relative;width:44px;height:55px;border-radius:8px;overflow:hidden;flex:none}
+.tag4{position:absolute;left:3px;bottom:3px;font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;background:#FFFFFF;color:#1B1B1A}
+.ghostbox{border:1.5px dashed var(--line-2);border-radius:6px}
+.stack{display:flex;flex-direction:column;gap:6px}
+.screen{position:relative;border-radius:12px;overflow:hidden;background:var(--field);display:flex;align-items:center;justify-content:center;margin:0 auto;max-width:100%}
+.screen svg.art,.vreel svg.art,.reel svg.art{position:absolute;inset:0}
+.playbtn{position:absolute;inset:0;border:none;background:transparent;display:flex;align-items:center;justify-content:center;padding:0}
+.playbtn span{width:44px;height:44px;border-radius:999px;background:rgba(20,20,20,.55);display:flex;align-items:center;justify-content:center;transition:opacity .2s ease}
+.prog{width:100%;height:3px;border-radius:999px;background:var(--field-2);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--ink)}
+.prog i.run{animation:prog 8s linear forwards}
+.track{display:flex;align-items:center;gap:12px;background:var(--field);border-radius:var(--r-ctl);padding:8px}
+.track .pb{width:var(--tap);height:var(--tap);border-radius:999px;flex:none;padding:0}
+.wave{flex:1;display:flex;align-items:center;gap:2px;height:36px}
+.wave span{flex:1;border-radius:3px;background:var(--line-2);transform-origin:center}
+.wave.live span{background:var(--ink-3)}
+.wave.on span{animation:bar .8s ease infinite}
+.wave.on span.lit{background:var(--ink)}
+textarea.prompt{width:100%;resize:vertical;min-height:84px;padding:12px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--field);font-size:var(--fs-body);line-height:1.45}
+textarea.prompt:focus{outline:none;border-color:var(--ink-3);box-shadow:0 0 0 3px var(--field-2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{min-height:var(--tap);padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2)}
+.chips button:hover{color:var(--ink);border-color:var(--line-2)}
+.sent{background:var(--field);border-radius:var(--r-ctl);padding:12px;font-size:var(--fs-cap);line-height:1.45;color:var(--ink-2)}
+.sent b{color:var(--ink);font-weight:600}
+.pin{display:flex;align-items:center;gap:6px;font-size:var(--fs-cap);color:var(--ink-2);min-width:0}
+.pin span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.busyline{display:flex;align-items:center;gap:8px;font-size:var(--fs-cap);font-weight:600;animation:shimmer .9s ease infinite}
+.busyline i{width:8px;height:8px;border-radius:999px;background:var(--ink)}
+.foot{display:flex;flex-direction:column;gap:10px;margin-top:2px;border-top:1px solid var(--line);padding-top:14px}
+.price{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.price b{font-weight:700}
+
+/* strings */
+.wire{flex:none;width:68px;height:200px;margin:0 -4px;position:relative;z-index:1;display:flex;align-items:center;justify-content:center}
+.wire svg{overflow:visible}
+.wl{position:absolute;top:calc(50% - 40px);left:50%;transform:translateX(-50%);font-size:var(--fs-cap);font-weight:600;background:var(--panel);border:1px solid var(--line);padding:1px 8px;border-radius:999px;white-space:nowrap}
+.plus{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:var(--tap);height:var(--tap);border:none;background:transparent;padding:0;display:flex;align-items:center;justify-content:center}
+.plus span{width:26px;height:26px;border-radius:999px;background:var(--panel);border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--ink-2);transition:all .15s ease}
+.plus:hover span,.wire.hot .plus span,.wire.drop .plus span{width:32px;height:32px;background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.flowpath{animation:flow 1s linear infinite}
+.empty{width:300px;flex:none;min-height:220px;border:2px dashed var(--line-2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px;background:color-mix(in srgb, var(--panel) 50%, transparent)}
+.empty.drop{border-color:var(--ink);background:var(--field)}
+
+/* deck */
+.deck{width:380px;flex:none;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;box-shadow:var(--shadow-2);padding:18px;display:flex;flex-direction:column;gap:16px}
+.deck.drop{outline:2px dashed var(--ink);outline-offset:4px}
+.deck-head{display:flex;gap:10px;align-items:center}
+.media{display:flex;gap:12px;align-items:flex-start}
+.fgrid{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.final{position:relative;display:block;width:100%;aspect-ratio:4/5;padding:0;border:none;border-radius:8px;overflow:hidden;background:transparent;cursor:zoom-in}
+.final.empty-slot{border:1.5px dashed var(--line-2);cursor:default}
+.reelcol{width:92px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.reel{position:relative;border-radius:10px;overflow:hidden;border:none;padding:0;background:var(--field);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.reel.none{border:1.5px dashed var(--line-2);background:transparent;cursor:default}
+.ticks{display:flex;flex-wrap:wrap;gap:6px}
+.tick{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;background:var(--field);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2)}
+.tick i{width:16px;height:16px;border-radius:999px;border:1.5px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px}
+.tick.ok{color:var(--ink)}
+.tick.ok i{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.disclose{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:var(--tap);padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--field);font-weight:600;text-align:left}
+.disclose svg{transition:transform .2s ease}
+.disclose[aria-expanded="true"] svg{transform:rotate(180deg)}
+.pricebox{display:flex;flex-direction:column;gap:12px;animation:rise .2s ease}
+.trade{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:4px 8px}
+.trade .n{font-weight:600;display:flex;flex-direction:column;min-width:0}
+.trade .n .cap{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trade .step{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--field)}
+.trade .step button{width:var(--tap);height:40px;border:none;background:transparent;font-size:18px;border-radius:var(--r-ctl)}
+.trade .step button:disabled{opacity:.3}
+.trade .c{min-width:56px;text-align:right;font-weight:600}
+.share{grid-column:1 / -1;height:3px;border-radius:999px;background:var(--field-2);overflow:hidden}
+.share i{display:block;height:100%;background:var(--ink);transition:width .35s ease}
+.role{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.tip{display:flex;align-items:center;gap:10px;background:var(--field);border-radius:var(--r-ctl);padding:10px 12px;font-size:var(--fs-cap);line-height:1.4}
+
+/* overlays */
+.backdrop{position:fixed;inset:0;z-index:60;background:var(--mask);display:flex;align-items:flex-start;justify-content:center;padding:max(72px, env(safe-area-inset-top,0px)) 16px 16px;overflow-y:auto;animation:fade .15s ease}
+.sheet{width:100%;max-width:520px;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-2);overflow:hidden;animation:rise .2s ease}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 20px;border-bottom:1px solid var(--line)}
+.sheet-body{padding:8px;display:flex;flex-direction:column;gap:2px}
+.mrow{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 12px;border-radius:12px;border:none;background:transparent;text-align:left;width:100%}
+.mrow:hover,.mrow[aria-pressed="true"]{background:var(--field)}
+.rec{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--ink);color:var(--panel);margin-left:6px}
+.qdots{display:inline-flex;gap:3px;vertical-align:middle}
+.qdots i{width:6px;height:6px;border-radius:999px;background:var(--line-2)}
+.qdots i.on{background:var(--ink)}
+.pf{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pf li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--field)}
+.pf li.need{background:var(--panel);border:1.5px solid var(--ink)}
+.popover{position:fixed;z-index:65;width:248px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-2);padding:6px;display:flex;flex-direction:column;gap:2px;animation:rise .15s ease}
+.mitem{display:flex;align-items:center;gap:10px;min-height:var(--tap);padding:0 10px 0 6px;border:none;border-radius:10px;background:transparent;text-align:left;width:100%}
+.mitem:hover{background:var(--field)}
+.mitem .n{flex:1;font-weight:600}
+.clickaway{position:fixed;inset:0;z-index:64;background:transparent;border:none}
+.panel-pop{position:fixed;z-index:65;width:320px;max-width:calc(100vw - 32px);background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-2);padding:16px;display:flex;flex-direction:column;gap:14px;animation:rise .15s ease}
+.kv{display:flex;justify-content:space-between;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:var(--fs-cap);font-weight:600;color:var(--ink-2)}
+.field select,.field input{min-height:var(--tap);border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--field);padding:0 12px;color:var(--ink);font-size:var(--fs-body);font-weight:400}
+.viewer{position:fixed;inset:0;z-index:70;background:var(--viewer);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:max(72px, env(safe-area-inset-top,0px)) 16px max(24px, env(safe-area-inset-bottom,0px));animation:fade .15s ease}
+.viewer .close{position:absolute;top:max(16px, env(safe-area-inset-top,0px));right:max(16px, env(safe-area-inset-right,0px))}
+.vstage{display:flex;align-items:center;gap:16px;max-width:100%}
+.vframe{position:relative;height:min(64vh,620px);aspect-ratio:4/5;max-width:calc(100vw - 140px);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-2);background:var(--field);animation:pop .25s ease both;cursor:zoom-in}
+.vframe.sq{aspect-ratio:1/1}
+.vframe.zoomed{cursor:zoom-out}
+.vframe .zin{position:absolute;inset:0;transition:transform .25s ease}
+.vframe img{width:100%;height:100%;object-fit:contain;display:block}
+.vframe .soft{filter:blur(3px) saturate(.85)}
+.vbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.likebtn{min-width:132px}
+.strip{display:flex;gap:6px;overflow-x:auto;max-width:min(720px, calc(100vw - 32px));padding:4px;scrollbar-width:thin}
+.strip button{position:relative;width:44px;height:44px;flex:none;padding:0;border:none;border-radius:8px;overflow:hidden;opacity:.6;background:var(--field)}
+.strip button[aria-current="true"]{opacity:1;outline:2.5px solid var(--ink);outline-offset:2px}
+.strip button:hover{opacity:1}
+.strip img{width:100%;height:100%;object-fit:cover;display:block}
+.strip .heart{width:13px;height:13px;top:2px;right:2px}
+.vimg{height:min(70vh,640px);aspect-ratio:4/5;max-width:calc(100vw - 140px);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-2);animation:pop .25s ease both}
+.vreel{position:relative;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-2);animation:pop .25s ease both;max-width:calc(100vw - 32px)}
+.vreel .playbtn span{width:72px;height:72px}
+.toast{position:fixed;left:50%;bottom:max(20px, env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:999px;font-size:var(--fs-cap);font-weight:600;box-shadow:var(--shadow-2);max-width:calc(100vw - 32px);animation:rise .2s ease}
+.toast.up{bottom:auto;top:calc(env(safe-area-inset-top,0px) + var(--topbar-h, 61px) + 76px)}
+
+/* coach card (quick start + full tour) */
+.coach-mask{position:fixed;z-index:50;border-radius:16px;box-shadow:0 0 0 9999px var(--mask);pointer-events:none;transition:all .3s cubic-bezier(.2,.8,.2,1)}
+.coach{position:fixed;z-index:55;width:340px;max-width:calc(100vw - 32px);background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-2);padding:18px;display:flex;flex-direction:column;gap:12px;transition:top .3s ease, left .3s ease}
+.coach p{margin:0;color:var(--ink-2)}
+.coach-nav{display:flex;align-items:center;gap:6px}
+.dots{display:flex;gap:5px;flex:1}
+.dots i{width:6px;height:6px;border-radius:999px;background:var(--line-2)}
+.dots i.on{background:var(--ink)}
+
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes rise{from{transform:translateY(6px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes slide{from{transform:translateY(-28px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes snap{0%{transform:scale(.92);opacity:0}70%{transform:scale(1.01);opacity:1}100%{transform:scale(1)}}
+@keyframes flow{to{stroke-dashoffset:-24}}
+@keyframes shimmer{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg) scale(1.05)}}
+@keyframes drift{0%{transform:translate(0,0);opacity:0}15%{opacity:.9}100%{transform:translate(14px,-34px);opacity:0}}
+@keyframes bar{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.1)}}
+@keyframes prog{from{width:0}to{width:100%}}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.sway{transform-origin:50% 92%;transform-box:view-box;animation:sway 1.6s ease-in-out infinite}
+.drift{animation:drift 2.4s ease-in infinite}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+@media (max-width: 900px){
+  .hero,.quote,.two{grid-template-columns:minmax(0,1fr)}
+  .four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .jar .jbar{width:56px}
+}
+@media (max-width: 600px){
+  .vframe{max-width:calc(100vw - 32px);height:auto;width:calc(100vw - 32px)}
+  .vstage>.btn{display:none}
+  .four,.vs{grid-template-columns:minmax(0,1fr)}
+  .vs>div:nth-child(odd){border-right:none}
+  .vs>.th:nth-child(2){display:none}
+  .nav{display:none}
+  .story{padding-block:36px 16px;gap:56px}
+  .sec h2{font-size:28px}
+  .deck{width:min(380px, calc(100vw - 72px))}
+  .bar{flex-wrap:wrap}
+  .blocks-bar{order:2;flex-basis:100%}
+  .jar{margin-left:auto}
+  .coach{left:16px!important;right:16px;bottom:max(16px, env(safe-area-inset-bottom,0px));top:auto!important;width:auto}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+(function(){
+const { useState, useEffect, useRef, useLayoutEffect } = React;
+const html = htm.bind(React.createElement);
+
+/* ---------------- data ---------------- */
+const MODELS = {
+  gpt2:{name:'GPT Image 2',cr:160,badge:'G2',q:5,tag:'Top realism'},
+  gpt25:{name:'GPT Image 2.5',cr:160,badge:'G2.5',q:5,tag:'Top realism, newest'},
+  nb21:{name:'Nano Banana 2.1',cr:50,badge:'NB',q:3,tag:'Fast and cheap'},
+  flux3:{name:'Flux 3',cr:50,badge:'F3',q:4,tag:'Good detail, low cost'},
+  nbpro:{name:'Nano Banana Pro',cr:80,badge:'NBP',q:4,tag:'Balanced'},
+  crisp2:{name:'Upscale 2×',cr:20,badge:'2×',q:3,tag:'Quick web sizes',res:'2K'},
+  crisp4:{name:'Upscale 4×',cr:40,badge:'4×',q:4,tag:'Feed and web in 4K',res:'4K'},
+  detail4:{name:'Detail 4×',cr:100,badge:'D4',q:5,tag:'Large print',res:'4K'},
+  seedance:{name:'Seedance',cr:400,badge:'SD',q:3,tag:'Lowest cost'},
+  hailuo:{name:'Hailuo',cr:500,badge:'HL',q:4,tag:'Balanced'},
+  kling:{name:'Kling',cr:700,badge:'KL',q:4,tag:'High detail'},
+  veo:{name:'Veo',cr:1200,badge:'VEO',q:5,tag:'Top detail'},
+  sfx:{name:'SFX Basic',cr:20,badge:'FX',q:3,tag:'Wind and birdsong'},
+  amb:{name:'Ambient Bed',cr:60,badge:'AB',q:4,tag:'Soft background pads'},
+  score:{name:'Short Score',cr:120,badge:'SC',q:5,tag:'A small custom melody'},
+  own:{name:'Your words',cr:0,badge:'Aa',q:2,tag:'Sent exactly as you write it'},
+  polish:{name:'Prompt Polish',cr:4,badge:'P+',q:4,tag:'Tidies wording, adds light and lens'},
+  expand:{name:'Prompt Expand',cr:10,badge:'P++',q:5,tag:'Full art direction from a few words'}
+};
+const TYPES = {
+  mood:{title:'Moodboard',job:'Explore ideas for the look',cat:'Image',unit:'images',list:['gpt2','gpt25','nb21','flux3','nbpro'],rec:'nb21',def:'nb21',n:12,step:{label:'Variations',min:4,max:24,by:4},role:'Extra',shade:'--s-mood'},
+  prompt:{title:'Prompt',job:'Say exactly what you want',cat:'Text',unit:'prompt',list:['own','polish','expand'],rec:'polish',def:'polish',n:0,role:'Text',shade:'--s-prompt'},
+  stills:{title:'Image',job:'Polished shots of your ♥',cat:'Image',unit:'images',list:['gpt2','gpt25','nb21','flux3','nbpro'],rec:'gpt2',def:'gpt2',n:2,step:{label:'Versions per ♥',min:1,max:4,by:1},role:'Main',shade:'--s-stills'},
+  up:{title:'Upscale',job:'Bigger and sharper, up to 4K',cat:'Upscale',unit:'upscales',list:['crisp2','crisp4','detail4'],rec:'crisp4',def:'crisp4',n:0,role:'Extra',shade:'--s-up'},
+  motion:{title:'Video',job:'Turn images into a Reel',cat:'Video',unit:'clips',list:['seedance','hailuo','kling','veo'],rec:'kling',def:'kling',n:1,step:{label:'Versions',min:1,max:4,by:1},role:'Main',shade:'--s-motion'},
+  sound:{title:'Sound',job:'Music or sound for the Reel',cat:'Sound',unit:'track',list:['sfx','amb','score'],rec:'sfx',def:'sfx',n:0,role:'Extra',shade:'--s-sound'}
+};
+const ORDER = ['mood','prompt','stills','up','motion','sound'];
+const PRESETS = {
+  visual:{label:'Visual first',m:{mood:'nb21',stills:'gpt2',up:'crisp4',motion:'veo',sound:'sfx',prompt:'expand'}},
+  balanced:{label:'Balanced',m:{mood:'nb21',stills:'nbpro',up:'crisp4',motion:'kling',sound:'amb',prompt:'polish'}},
+  lean:{label:'Lean',m:{mood:'nb21',stills:'flux3',up:'crisp2',motion:'seedance',sound:'sfx',prompt:'own'}}
+};
+const PEOPLE = {L:{bg:'#D8D8D3',fg:'#1D1D1C',name:'Lena'},M:{bg:'#A9A9A3',fg:'#1D1D1C',name:'Mio'},R:{bg:'#1D1D1C',fg:'#FFFFFF',name:'You'}};
+
+/* ---------------- icons ---------------- */
+const IC = {
+  mood:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
+  prompt:'<path d="M4 7V5h16v2"/><path d="M12 5v14"/><path d="M9 19h6"/>',
+  stills:'<rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5L5 20"/>',
+  up:'<path d="M14 4h6v6"/><path d="M10 20H4v-6"/><path d="M20 4l-7 7"/><path d="M4 20l7-7"/>',
+  motion:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m10 9.2 5 2.8-5 2.8z"/>',
+  sound:'<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+  deck:'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  chev:'<path d="m6 9 6 6 6-6"/>',
+  upl:'<path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  star:'<path d="m12 2.8 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.6l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9z"/>',
+  remix:'<path d="M4 7h11a4 4 0 0 1 0 8H9"/><path d="m7 4-3 3 3 3"/><path d="M12 18l-3-3"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  warn:'<path d="M12 3 2 21h20z"/><path d="M12 10v5"/><path d="M12 18h.01"/>',
+  arrow:'<path d="M3 12h16"/><path d="m14 7 5 5-5 5"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  price:'<path d="M12 3v18"/><path d="M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/>',
+  team:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.5a5 5 0 0 1 5.5 5"/>',
+  shield:'<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/>',
+  jar:'<path d="M7 4h10"/><path d="M8 4v3c-2 1-3 3-3 5v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6c0-2-1-4-3-5V4"/><path d="M5 13h14"/>'
+};
+function Icon({n, s=16, w=2, fill='none'}){
+  return html`<svg width=${s} height=${s} viewBox="0 0 24 24" fill=${fill} stroke="currentColor" stroke-width=${w} stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" dangerouslySetInnerHTML=${{__html:IC[n]}}></svg>`;
+}
+const PLAY = 'M8 5v14l11-7z', PAUSE = 'M6 5h4v14H6zM14 5h4v14h-4z';
+const HEART = 'M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3.4 5 7 5c2 0 3.6 1.1 5 2.8C13.4 6.1 15 5 17 5c3.6 0 5.8 3.6 4.5 6.8C19.5 16.4 12 21 12 21z';
+
+/* ---------------- flowers (the "work") ---------------- */
+const BGS = ['#F7E4EB','#FBEFD9','#E3EFDF','#E1E9F4','#EEE5F6','#FBF2E1','#E0F1ED','#F8E6DC','#F2EEE4'];
+const PETALS = ['#EF6AA6','#F6A23A','#F2C744','#B07BEC','#EC6262','#FFFFFF','#F7884C','#E46DD6','#7DA6F3','#F49AC2'];
+const CENTERS = ['#7A4A1E','#F3A322','#3E2A15','#F7D66A'];
+const STEMS = ['#4C8B4A','#3E7A45','#5F9F53'];
+const GROUNDS = ['#D5E6CB','#CBE0C2','#E0EBD2','#D9E7CF'];
+function flowerSpec(key){
+  key = key || {i:0,seed:1,v:0,tint:null};
+  const k = Math.abs(((key.i|0) * 7 + (key.seed|0) * 13) % 997);
+  const v = key.v|0;
+  const tint = key.tint || {};
+  const count = 5 + (k % 4);
+  const cx = 20 + ((k*5) % 7) - 3 + (v ? ((v % 2) ? 1.6 : -1.6) : 0);
+  const cy = 15.5 + ((k*3) % 4) + (v ? (v % 3) * 0.4 : 0);
+  const len = 5.4 + ((k*7) % 3) * 0.75 + (v ? 0.3 : 0);
+  const wid = 2.5 + ((k*11) % 3) * 0.45;
+  const rot = ((k*17) % 60) + v * 11;
+  const sway = cx + (((k*3) % 7) - 3);
+  const petals = [];
+  for (let j = 0; j < count; j++) petals.push(rot + j * (360 / count));
+  return {
+    bg: tint.bg || BGS[(k + v) % BGS.length],
+    petal: tint.petal || PETALS[(k*3) % PETALS.length],
+    center: CENTERS[(k*5) % CENTERS.length],
+    stem: STEMS[k % STEMS.length],
+    ground: tint.bg && tint.dark ? '#3B3A52' : GROUNDS[(k + v) % GROUNDS.length],
+    cx, cy, len, wid, petals,
+    sunX: 6 + ((k*13) % 28), sunY: 6 + ((k*5) % 6),
+    stemPath: 'M'+cx.toFixed(1)+' '+(cy+2).toFixed(1)+' Q '+sway.toFixed(1)+' 30 '+cx.toFixed(1)+' 42',
+    leafL: (cx - 4).toFixed(1), leafR: (cx + 4).toFixed(1)
+  };
+}
+function Flower({k, anim, drift}){
+  const f = flowerSpec(k);
+  const petals = f.petals.map((a, j) => html`<ellipse key=${j} cx=${f.cx} cy=${(f.cy - f.len*0.62).toFixed(2)} rx=${f.wid} ry=${(f.len*0.62).toFixed(2)} transform=${'rotate('+a.toFixed(1)+' '+f.cx+' '+f.cy+')'} fill=${f.petal} stroke="rgba(0,0,0,0.06)" stroke-width="0.3"/>`);
+  return html`<svg className="art" viewBox="0 0 40 40" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="40" height="40" fill=${f.bg}/>
+    <circle cx=${f.sunX} cy=${f.sunY} r="6" fill="#FFFFFF" opacity="0.5"/>
+    <path d="M0 31 Q 10 28.5 20 31 T 40 30 V40 H0Z" fill=${f.ground}/>
+    <g className=${anim ? 'sway' : ''}>
+      <path d=${f.stemPath} stroke=${f.stem} stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx=${f.leafL} cy="30" rx="4.2" ry="1.7" transform=${'rotate(-24 '+f.leafL+' 30)'} fill=${f.stem}/>
+      <ellipse cx=${f.leafR} cy="33" rx="4.2" ry="1.7" transform=${'rotate(24 '+f.leafR+' 33)'} fill=${f.stem}/>
+      ${petals}
+      <circle cx=${f.cx} cy=${f.cy} r="2.5" fill=${f.center}/>
+      <circle cx=${(f.cx-0.7).toFixed(1)} cy=${(f.cy-0.7).toFixed(1)} r="0.8" fill="#FFFFFF" opacity="0.45"/>
+    </g>
+    ${drift ? html`<g>
+      <ellipse className="drift" cx="12" cy="30" rx="1.1" ry="0.7" fill=${f.petal} style=${{animationDelay:'0s'}}/>
+      <ellipse className="drift" cx="25" cy="34" rx="1" ry="0.6" fill=${f.petal} style=${{animationDelay:'.8s'}}/>
+      <ellipse className="drift" cx="18" cy="36" rx="0.9" ry="0.6" fill=${f.petal} style=${{animationDelay:'1.6s'}}/>
+    </g>` : null}
+  </svg>`;
+}
+
+/* ---------------- money + flow logic ---------------- */
+const range = n => Array.from({length:n}, (_, i) => i);
+function money(cr, st){
+  const amt = (cr / 1000) * st.rate;
+  const num = Math.abs(amt).toFixed(2);
+  const sign = amt < -0.004 ? '−' : '';
+  return sign + (st.currency === 'CHF' ? 'CHF ' + num : st.currency + num);
+}
+const credits = v => Math.round(v).toLocaleString('en-US') + ' cr';
+function tintFrom(text){
+  const t = (text || '').toLowerCase();
+  const P = [['pink','#EF6AA6'],['peon','#F28DBE'],['rose','#EC6E8F'],['yellow','#F2C744'],['sunflower','#F2C744'],['white','#FFFFFF'],['purple','#A877EC'],['lavender','#B79CFF'],['red','#E85454'],['orange','#F7884C'],['blue','#6E9CF0']];
+  const B = [['golden','#FBE3B8',0],['sunset','#F9D2B6',0],['night','#2E2D44',1],['dark','#2E2D44',1],['mint','#DCF2EA',0],['fresh','#E3F3EF',0],['studio','#EFEFEC',0],['sky','#DDE9FA',0]];
+  let petal = null, bg = null, dark = 0;
+  P.forEach(p => { if (!petal && t.indexOf(p[0]) >= 0) petal = p[1]; });
+  B.forEach(p => { if (!bg && t.indexOf(p[0]) >= 0) { bg = p[1]; dark = p[2]; } });
+  return (petal || bg) ? {petal, bg, dark} : null;
+}
+function polishText(model, text){
+  const base = (text || '').trim() || 'spring flowers';
+  if (model === 'polish') return base + ', soft natural light, shallow depth of field, clean background';
+  if (model === 'expand') return base + ', 85mm lens, golden rim light, dewy petals, airy pastel palette, editorial composition, safe for a 4:5 crop';
+  return base;
+}
+const isPass = t => t === 'prompt' || t === 'sound';
+function computeFlow(f){
+  let prevOut = null, prevRan = true, prevTitle = '', upEst = false, planned = 0, spent = 0, proj = 0, promptIn = null, realIdx = 0;
+  const info = {};
+  f.blocks.forEach(b => {
+    const unit = MODELS[b.model].cr;
+    if (b.type === 'prompt'){
+      const cost = unit;
+      if (!b.ran) planned += cost; spent += b.spent; proj += b.ran ? b.spent : cost;
+      info[b.id] = {count:1, cost, unit, locked:false, lockText:'', est:false, inp:0, promptIn:null};
+      if (b.ran && b.out) promptIn = b.out;
+      return;
+    }
+    const first = realIdx === 0;
+    const inp = prevOut === null ? 4 : prevOut;
+    let count = 1;
+    if (b.type === 'mood') count = b.n;
+    else if (b.type === 'stills') count = (first ? 4 : inp) * b.n;
+    else if (b.type === 'up') count = inp;
+    else if (b.type === 'motion') count = b.n;
+    let locked = false, lockText = '';
+    if (first && (b.type === 'up' || b.type === 'motion')) { locked = true; lockText = 'Needs images before it'; }
+    else if (!first && b.type !== 'sound'){
+      if (!prevRan) { locked = true; lockText = 'Run ' + prevTitle + ' first'; }
+      else if (prevOut === 0) { locked = true; lockText = 'Tap ♥ in ' + prevTitle + ' first'; }
+    }
+    const est = !b.ran && upEst && b.type !== 'sound';
+    const cost = count * unit;
+    if (!b.ran) planned += cost; spent += b.spent; proj += b.ran ? b.spent : cost;
+    info[b.id] = {count, cost, unit, locked, lockText, est, inp: first ? 0 : inp, promptIn};
+    promptIn = null;
+    if (b.type !== 'sound'){
+      let out = prevOut;
+      if (b.type === 'mood') out = b.ran ? b.picks.length : 4;
+      else if (b.type === 'stills') out = b.ran ? b.picks.length : (first ? 4 : inp);
+      else if (b.type === 'up') out = b.ran ? b.items.length : inp;
+      upEst = upEst || !b.ran;
+      prevOut = out; prevRan = b.ran; prevTitle = TYPES[b.type].title; realIdx += 1;
+    }
+  });
+  return {info, planned, spent, proj};
+}
+function totals(S){
+  let spent = 0, next = 0;
+  const spentBy = {};
+  S.flows.forEach(f => {
+    const r = computeFlow(f);
+    spent += r.spent;
+    f.blocks.forEach(b => { next += r.info[b.id].cost; spentBy[b.type] = (spentBy[b.type] || 0) + b.spent; });
+  });
+  const top = S.flows[S.flows.length - 1];
+  const tr = top ? computeFlow(top) : {planned:0, info:{}};
+  return {spent, next, planned: tr.planned, spentBy, top, topInfo: tr.info};
+}
+function sourceItems(prev){
+  if (!prev) return [];
+  if (prev.type === 'mood' || prev.type === 'stills') return prev.picks.map(p => prev.items[p]).filter(Boolean);
+  if (prev.type === 'up') return prev.items;
+  if (prev.type === 'motion') return prev.item ? [prev.item] : [];
+  return [];
+}
+function prevRealOf(f, idx){
+  for (let i = idx - 1; i >= 0; i--) { if (!isPass(f.blocks[i].type)) return f.blocks[i]; }
+  return null;
+}
+function nextRealOf(f, idx){
+  for (let i = idx + 1; i < f.blocks.length; i++) { if (f.blocks[i].type !== 'prompt') return f.blocks[i]; }
+  return null;
+}
+function blank(o){ return Object.assign({n:0, aspect:'', ran:false, busy:false, runs:0, spent:0, seed:1, picks:[], items:[], item:null, text:'', out:'', refs:[], per:0, res:'', aspectRan:'', modelRan:''}, o); }
+function finishRun(n, fid, bid){
+  const f = n.flows.find(x => x.id === fid); if (!f) return null;
+  const b = f.blocks.find(x => x.id === bid); if (!b) return null;
+  const info = computeFlow(f).info[bid];
+  const idx = f.blocks.indexOf(b);
+  const prev = prevRealOf(f, idx);
+  const tint = info.promptIn ? tintFrom(info.promptIn) : null;
+  b.busy = false; b.ran = true; b.runs += 1; b.spent += info.cost; b.seed += 5; b.picks = [];
+  if (b.type === 'prompt') b.out = polishText(b.model, b.text);
+  else if (b.type === 'mood') b.items = range(b.n).map(i => ({i, seed:b.seed, v:0, tint}));
+  else if (b.type === 'stills'){
+    const favs = prev ? sourceItems(prev) : range(4).map(i => ({i, seed:b.seed, v:0, tint:null}));
+    b.items = []; b.per = b.n;
+    favs.forEach(fv => { for (let k = 0; k < b.n; k++) b.items.push({i:fv.i, seed:fv.seed, v:k + 1 + b.runs * 2, tint: tint || fv.tint || null}); });
+  }
+  else if (b.type === 'up'){ b.items = sourceItems(prev).map(x => Object.assign({}, x)); b.res = MODELS[b.model].res; }
+  else if (b.type === 'motion'){ const src = sourceItems(prev); const s0 = src[0] || {i:1, seed:b.seed, v:0}; b.item = Object.assign({}, s0, {tint: tint || s0.tint || null}); b.aspectRan = b.aspect; b.modelRan = b.model; }
+  else if (b.type === 'sound'){ b.modelRan = b.model; }
+  return {f, b, info, idx};
+}
+function deckOf(f){
+  const last = t => { for (let i = f.blocks.length - 1; i >= 0; i--) if (f.blocks[i].type === t) return f.blocks[i]; return null; };
+  const mood = last('mood'), st = last('stills'), up = last('up'), mo = last('motion'), so = last('sound');
+  let finals = [], label = 'Stills · nothing yet', model = '';
+  if (up && up.ran && !up.busy && up.items.length){ finals = up.items; label = 'Stills · upscaled ' + (up.res || '4K'); model = MODELS[up.model].name; }
+  else if (st && st.ran && !st.busy && st.picks.length){ finals = st.picks.map(p => st.items[p]); label = 'Stills · your ♥ images'; model = MODELS[st.model].name; }
+  else if (mood && mood.ran && !mood.busy && mood.picks.length){ finals = mood.picks.map(p => mood.items[p]); label = 'Stills · moodboard ♥ (draft)'; model = MODELS[mood.model].name; }
+  const reel = mo && mo.ran && !mo.busy ? mo : null;
+  const sound = so && so.ran && !so.busy ? so : null;
+  return {mood, st, up, mo, so, finals, label, model, reel, sound};
+}
+
+/* ---------------- audio ---------------- */
+const Audio8 = (function(){
+  let ac = null, master = null, nodes = [];
+  function start(model, seed){
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+      if (!ac) ac = new AC();
+      if (ac.state === 'suspended') ac.resume();
+      stop(true);
+      const t0 = ac.currentTime + 0.05, dur = 8;
+      master = ac.createGain();
+      master.gain.setValueAtTime(0, t0); master.gain.linearRampToValueAtTime(0.9, t0 + 0.3);
+      master.gain.setValueAtTime(0.9, t0 + dur - 0.7); master.gain.linearRampToValueAtTime(0, t0 + dur);
+      master.connect(ac.destination);
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2600; lp.connect(master);
+      const tr = ((seed || 0) % 5) - 2;
+      const fq = m => 440 * Math.pow(2, (m + tr - 69) / 12);
+      const note = (freq, start, len, type, vol, attack, release) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = type; o.frequency.setValueAtTime(freq, start);
+        g.gain.setValueAtTime(0.0001, start); g.gain.linearRampToValueAtTime(vol, start + attack);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + len + release);
+        o.connect(g); g.connect(lp); o.start(start); o.stop(start + len + release + 0.05); nodes.push(o);
+      };
+      const chords = [[60,64,67,71],[57,60,64,67],[53,57,60,64],[55,59,62,67]];
+      if (model === 'amb'){
+        chords.forEach((ch, i) => { ch.forEach(m => note(fq(m), t0 + i*2, 1.8, 'sine', 0.06, 0.6, 0.9)); note(fq(ch[0] - 12), t0 + i*2, 1.8, 'triangle', 0.05, 0.5, 0.9); });
+      } else if (model === 'score'){
+        const pat = [0,1,2,3,2,1,2,3];
+        chords.forEach((ch, i) => {
+          note(fq(ch[0] - 24), t0 + i*2, 1.7, 'triangle', 0.14, 0.02, 0.4);
+          ch.forEach(m => note(fq(m), t0 + i*2, 1.8, 'sine', 0.02, 0.4, 0.6));
+          pat.forEach((p, k) => note(fq(ch[p] + 12), t0 + i*2 + k*0.25, 0.12, 'triangle', 0.09, 0.008, 0.35));
+        });
+      } else {
+        const len = 2 * ac.sampleRate, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+        const noise = ac.createBufferSource(); noise.buffer = buf; noise.loop = true;
+        const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 520; bp.Q.value = 0.8;
+        const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 0.18; lg.gain.value = 320; lfo.connect(lg); lg.connect(bp.frequency);
+        const ng = ac.createGain(); ng.gain.value = 0.22;
+        noise.connect(bp); bp.connect(ng); ng.connect(master);
+        noise.start(t0); noise.stop(t0 + dur); lfo.start(t0); lfo.stop(t0 + dur); nodes.push(noise, lfo);
+        [0.8, 2.1, 2.4, 3.9, 5.2, 5.5, 6.7].forEach((tt, i) => {
+          for (let r = 0; r < 3; r++){
+            const st = t0 + tt + r * 0.11, o = ac.createOscillator(), g = ac.createGain();
+            const base = 2600 + ((i * 370 + (seed || 0) * 50) % 900);
+            o.type = 'sine'; o.frequency.setValueAtTime(base, st); o.frequency.exponentialRampToValueAtTime(base * 1.5, st + 0.07);
+            g.gain.setValueAtTime(0.0001, st); g.gain.linearRampToValueAtTime(0.045, st + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, st + 0.09);
+            o.connect(g); g.connect(master); o.start(st); o.stop(st + 0.12); nodes.push(o);
+          }
+        });
+      }
+      return true;
+    } catch (e) { return false; }
+  }
+  function stop(){
+    if (master && ac){
+      try { const t = ac.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(0, t + 0.12); } catch (e) {}
+      const old = nodes; setTimeout(() => old.forEach(x => { try { x.stop(); } catch (e) {} }), 200);
+    }
+    master = null; nodes = [];
+  }
+  return {start, stop};
+})();
+
+/* ---------------- initial demo state ---------------- */
+function initialState(settings){
+  const pinkGold = {petal:'#EF6AA6', bg:'#FBE3B8', dark:0};
+  const moodA = blank({id:11, type:'mood', model:'flux3', n:12, ran:true, runs:1, spent:600, seed:3, picks:[1,4,7,9], refs:[{src:'', k:{i:2, seed:40, v:0}}]});
+  moodA.items = range(12).map(i => ({i, seed:3, v:0, tint:null}));
+  const promptA = blank({id:16, type:'prompt', model:'polish', ran:true, runs:1, spent:4, text:'pink peonies, golden hour', out:'pink peonies, golden hour, soft natural light, shallow depth of field, clean background'});
+  const stillsA = blank({id:12, type:'stills', model:'gpt2', n:2, ran:true, runs:1, spent:1280, seed:20, per:2, picks:[0,2,3,5,6,7]});
+  [1,4,7,9].forEach(fi => { for (let k = 0; k < 2; k++) stillsA.items.push({i:fi, seed:3, v:k + 3, tint:pinkGold}); });
+  const upA = blank({id:13, type:'up', model:'crisp4', ran:true, runs:1, spent:240, seed:21, res:'4K'});
+  upA.items = stillsA.picks.map(p => Object.assign({}, stillsA.items[p]));
+  const motionA = blank({id:14, type:'motion', model:'kling', modelRan:'kling', n:1, aspect:'9:16', aspectRan:'9:16', ran:true, runs:1, spent:700, seed:41});
+  motionA.item = Object.assign({}, upA.items[0]);
+  const soundA = blank({id:15, type:'sound', model:'score', modelRan:'score', ran:true, runs:1, spent:120, seed:50});
+  const moodB = blank({id:21, type:'mood', model:'nb21', n:12, ran:true, runs:1, spent:600, seed:11, refs:[{src:'', k:{i:5, seed:30, v:0}}, {src:'', k:{i:1, seed:33, v:0}}]});
+  moodB.items = range(12).map(i => ({i, seed:11, v:0, tint:null}));
+  return {
+    flows: [
+      {id:1, name:'Flow A', from:null, note:'Pink and golden, the full campaign', votes:['M'], blocks:[moodA, promptA, stillsA, upA, motionA, soundA]},
+      {id:2, name:'Flow B', from:null, note:'A second direction, just started', votes:['L'], blocks:[moodB]}
+    ],
+    nextId:100, kept:null, settings: settings || {budget:15000, currency:'$', rate:1.65},
+    dontAsk:false, picker:null, preflight:null, viewer:null, insert:null, settingsOpen:false,
+    toast:null, delta:0, deltaKey:0, playing:null, dropOn:null, tour:null
+  };
+}
+
+
+
+/* ---------------- UI state (kept apart from the engine data) ---------------- */
+const HINTS_KEY = 'blockflow-hints-v1';
+function loadSeen(){ try { return JSON.parse(localStorage.getItem(HINTS_KEY) || '[]'); } catch (e) { return []; } }
+function saveSeen(list){ try { localStorage.setItem(HINTS_KEY, JSON.stringify(list)); } catch (e) {} }
+function freshState(settings, seen){
+  return Object.assign(initialState(settings), {qs:null, seen: seen || loadSeen(), priceOpen:{}, jarOpen:false, flowMenu:null});
+}
+/* The single "next step" in the top flow gets the primary button. */
+function nextStepId(f){
+  if (!f) return null;
+  const info = computeFlow(f).info;
+  for (const b of f.blocks){ const i = info[b.id]; if (!b.ran && !b.busy && !i.locked) return b.id; }
+  return null;
+}
+/* Concepts are introduced one at a time, when they become useful. */
+function currentHint(S){
+  if (S.qs != null || S.tour != null) return null;
+  const top = S.flows[S.flows.length - 1]; if (!top) return null;
+  const seen = S.seen;
+  const d = deckOf(top);
+  const ranImage = top.blocks.some(b => b.type === 'stills' && b.ran);
+  const hasPrompt = top.blocks.some(b => b.type === 'prompt');
+  const list = [
+    {id:'prompt', when: ranImage && !hasPrompt, text:'Want a specific look? Tap + between two blocks and add a Prompt.'},
+    {id:'price', when: d.finals.length > 0, text:'Open “Play with the price” in the deck to see where the money goes.', act:'price'},
+    {id:'remix', when: seen.indexOf('price') >= 0, text:'Try another direction: Remix copies this flow so the team can compare.'}
+  ];
+  return list.find(h => h.when && seen.indexOf(h.id) < 0) || null;
+}
+
+/* ---------------- app ---------------- */
+function App(){
+  const [S, setS] = useState(() => freshState());
+  const timers = useRef([]);
+  const dragType = useRef(null);
+  const toastKey = useRef(0);
+  const st = S.settings;
+  const $ = v => money(v, st);
+  const T = totals(S);
+
+  function update(fn){
+    setS(prev => {
+      const n = typeof structuredClone === 'function' ? structuredClone(prev) : JSON.parse(JSON.stringify(prev));
+      fn(n);
+      const before = totals(prev).next, after = totals(n).next;
+      if (Math.abs(after - before) > 0.001){ n.delta = after - before; n.deltaKey = prev.deltaKey + 1; }
+      return n;
+    });
+  }
+  function say(n, text){ toastKey.current += 1; n.toast = {text, key: toastKey.current}; }
+  useEffect(() => { if (!S.toast) return; const t = setTimeout(() => setS(p => p.toast && p.toast.key === S.toast.key ? Object.assign({}, p, {toast:null}) : p), 2600); return () => clearTimeout(t); }, [S.toast && S.toast.key]);
+  useEffect(() => { if (!S.deltaKey) return; const t = setTimeout(() => setS(p => p.deltaKey === S.deltaKey ? Object.assign({}, p, {delta:0}) : p), 1800); return () => clearTimeout(t); }, [S.deltaKey]);
+  useEffect(() => () => { timers.current.forEach(clearTimeout); Audio8.stop(); }, []);
+  useEffect(() => { saveSeen(S.seen); }, [S.seen.join(',')]);
+  useLayoutEffect(() => {
+    const el = document.querySelector('.topbar'); if (!el) return;
+    const set = () => document.documentElement.style.setProperty('--topbar-h', el.offsetHeight + 'px');
+    set();
+    let ro = null; try { ro = new ResizeObserver(set); ro.observe(el); } catch (e) { window.addEventListener('resize', set); }
+    return () => { if (ro) ro.disconnect(); else window.removeEventListener('resize', set); };
+  }, []);
+
+  const findFlow = (n, fid) => n.flows.find(x => x.id === fid);
+  const findBlock = (n, fid, bid) => { const f = findFlow(n, fid); return f ? f.blocks.find(x => x.id === bid) : null; };
+
+  const A = {
+    insert(fid, type, at){
+      update(n => {
+        const f = findFlow(n, fid); if (!f || !TYPES[type]) return;
+        const t = TYPES[type], id = n.nextId++;
+        const b = blank({id, type, model:t.def, n:t.n, aspect: type === 'motion' ? '9:16' : '', seed:id * 3});
+        const pos = at == null ? f.blocks.length : Math.max(0, Math.min(f.blocks.length, at));
+        f.blocks.splice(pos, 0, b);
+        n.insert = null; n.dropOn = null;
+        say(n, t.title + ' added');
+      });
+    },
+    remove(fid, bid){ update(n => { const f = findFlow(n, fid); if (f){ const b = f.blocks.find(x => x.id === bid); f.blocks = f.blocks.filter(x => x.id !== bid); if (b) say(n, TYPES[b.type].title + ' removed'); } }); },
+    setModel(fid, bid, m){ update(n => { const b = findBlock(n, fid, bid); if (b) b.model = m; n.picker = null; }); },
+    setN(fid, bid, v){ update(n => { const b = findBlock(n, fid, bid); if (b) b.n = v; }); },
+    setAspect(fid, bid, a){ update(n => { const b = findBlock(n, fid, bid); if (b) b.aspect = a; }); },
+    setText(fid, bid, v){ setS(p => { const n = JSON.parse(JSON.stringify(p)); const b = findBlock(n, fid, bid); if (b) b.text = v; return n; }); },
+    addChip(fid, bid, c){ update(n => { const b = findBlock(n, fid, bid); if (b) b.text = (b.text ? b.text.replace(/[ ,]+$/, '') + ', ' : '') + c; }); },
+    pick(fid, bid, i){ update(n => { const b = findBlock(n, fid, bid); if (!b) return; b.picks = b.picks.indexOf(i) >= 0 ? b.picks.filter(x => x !== i) : b.picks.concat([i]); }); },
+    pickMany(fid, bid, list){ update(n => { const b = findBlock(n, fid, bid); if (b) b.picks = list.slice(); }); },
+    run(fid, bid, force){
+      const f = S.flows.find(x => x.id === fid); if (!f) return;
+      const b = f.blocks.find(x => x.id === bid); if (!b || b.busy) return;
+      const info = computeFlow(f).info[bid]; if (info.locked) return;
+      if (b.type === 'motion' && !S.dontAsk && !force){ update(n => { n.preflight = {fid, bid}; }); return; }
+      update(n => { const bb = findBlock(n, fid, bid); if (bb) bb.busy = true; n.preflight = null; });
+      const ms = b.type === 'prompt' ? 600 : (b.type === 'motion' ? 1700 : 1150);
+      timers.current.push(setTimeout(() => update(n => {
+        const r = finishRun(n, fid, bid); if (!r) return;
+        if (r.b.type === 'prompt'){ const nr = nextRealOf(r.f, r.idx); say(n, 'Prompt sent' + (nr ? ' to ' + TYPES[nr.type].title : '')); }
+        else say(n, TYPES[r.b.type].title + ' ready · ' + $(r.info.cost));
+      }), ms));
+    },
+    newFlow(){ update(n => { const id = n.nextId++; const name = 'Flow ' + String.fromCharCode(65 + (n.flows.length % 26)); n.flows.push({id, name, from:null, note:'', votes:[], blocks:[]}); say(n, name + ' started'); }); },
+    remix(fid){
+      update(n => {
+        const src = findFlow(n, fid); if (!src) return;
+        const id = n.nextId++;
+        const name = 'Flow ' + String.fromCharCode(65 + (n.flows.length % 26));
+        const blocks = src.blocks.map(b => blank({id:n.nextId++, type:b.type, model:b.model, n:b.n, aspect:b.aspect, text:b.text, refs:b.refs.slice(), seed:(n.nextId) * 3}));
+        n.flows.push({id, name, from:src.name, note:'', votes:[], blocks});
+        n.flowMenu = null;
+        say(n, name + ' remixed from ' + src.name);
+      });
+    },
+    vote(fid){ update(n => { const f = findFlow(n, fid); if (f) f.votes = f.votes.indexOf('R') >= 0 ? f.votes.filter(x => x !== 'R') : f.votes.concat(['R']); n.flowMenu = null; }); },
+    keep(fid){ update(n => { n.kept = n.kept === fid ? null : fid; n.flowMenu = null; if (n.kept) say(n, findFlow(n, fid).name + ' is the team pick'); }); },
+    preset(fid, key){ update(n => { const f = findFlow(n, fid); const p = PRESETS[key]; if (!f) return; f.blocks.forEach(b => { if (p.m[b.type]) b.model = p.m[b.type]; }); }); },
+    upload(fid, bid, e){
+      const files = e && e.target && e.target.files ? Array.prototype.slice.call(e.target.files, 0, 6) : [];
+      files.forEach(file => {
+        if (!file.type || file.type.indexOf('image/') !== 0) return;
+        const rd = new FileReader();
+        rd.onload = () => update(n => { const b = findBlock(n, fid, bid); if (b) { b.refs = b.refs.concat([{src:String(rd.result)}]).slice(-8); say(n, 'Reference added'); } });
+        rd.readAsDataURL(file);
+      });
+      if (e && e.target) e.target.value = '';
+    },
+    play(key, soundBlock){
+      if (S.playing === key){ Audio8.stop(); update(n => { n.playing = null; }); return; }
+      if (soundBlock) Audio8.start(soundBlock.modelRan || soundBlock.model, soundBlock.seed); else Audio8.stop();
+      update(n => { n.playing = key; });
+      timers.current.push(setTimeout(() => setS(p => p.playing === key ? Object.assign({}, p, {playing:null}) : p), 8000));
+    },
+    openViewer(v, soundBlock){
+      update(n => { n.viewer = v; });
+      if (v.kind === 'reel'){
+        const key = 'view-' + v.fid;
+        if (soundBlock) Audio8.start(soundBlock.modelRan || soundBlock.model, soundBlock.seed); else Audio8.stop();
+        update(n => { n.playing = key; });
+        timers.current.push(setTimeout(() => setS(p => p.playing === key ? Object.assign({}, p, {playing:null}) : p), 8000));
+      }
+    },
+    closeViewer(){ Audio8.stop(); update(n => { n.viewer = null; n.playing = null; }); },
+    reset(silent){ timers.current.forEach(clearTimeout); timers.current = []; Audio8.stop(); setS(p => Object.assign(freshState(p.settings, p.seen), silent ? {} : {toast:{text:'Demo reset', key:++toastKey.current}})); },
+    setSettings(patch){ update(n => { Object.assign(n.settings, patch); }); },
+    openPicker(fid, bid){ update(n => { n.picker = {fid, bid}; n.insert = null; }); },
+    openInsert(fid, at, r, label){ update(n => { n.insert = (n.insert && n.insert.fid === fid && n.insert.at === at) ? null : {fid, at, x: r.left + r.width / 2, y: r.bottom, label}; }); },
+    openPreflight(fid, bid){ update(n => { n.preflight = {fid, bid}; }); },
+    togglePrice(fid, open){ update(n => { n.priceOpen[fid] = open == null ? !n.priceOpen[fid] : open; }); },
+    seeHint(id){ update(n => { if (n.seen.indexOf(id) < 0) n.seen.push(id); }); },
+    set(patch){ setS(p => Object.assign({}, p, patch)); }
+  };
+
+  const dnd = {
+    start(type){ return e => { dragType.current = type; try { e.dataTransfer.setData('text/plain', type); e.dataTransfer.effectAllowed = 'copy'; } catch (er) {} }; },
+    end(){ dragType.current = null; setS(p => p.dropOn ? Object.assign({}, p, {dropOn:null}) : p); },
+    over(key){ return e => { if (!dragType.current) return; e.preventDefault(); if (S.dropOn !== key) setS(p => Object.assign({}, p, {dropOn:key})); }; },
+    leave(key){ return () => setS(p => p.dropOn === key ? Object.assign({}, p, {dropOn:null}) : p); },
+    drop(fid, at){ return e => { e.preventDefault(); let t = dragType.current; try { t = t || e.dataTransfer.getData('text/plain'); } catch (er) {} dragType.current = null; if (t) A.insert(fid, t, at); else setS(p => Object.assign({}, p, {dropOn:null})); }; }
+  };
+
+  const topId = S.flows.length ? S.flows[S.flows.length - 1].id : null;
+  const free = st.budget - T.spent - T.planned;
+  const scrollTo = id => { const el = document.getElementById(id); if (el) el.scrollIntoView({behavior:'smooth'}); };
+  const startQuick = () => { A.reset(true); setTimeout(() => { setS(p => Object.assign({}, p, {qs:0, tour:null})); }, 60); };
+  const startTour = () => { A.reset(true); setTimeout(() => setS(p => Object.assign({}, p, {tour:0, qs:null, jarOpen:false, settingsOpen:false})), 60); };
+  const hint = currentHint(S);
+
+  return html`
+    <header className="topbar">
+      <div className="wrap topbar-in">
+        <a className="brand" href="#story" onClick=${e => { e.preventDefault(); scrollTo('story'); }}><span className="mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>Blockflow</a>
+        <nav className="nav" aria-label="Sections">
+          <a href="#story" onClick=${e => { e.preventDefault(); scrollTo('story'); }}>Idea</a>
+          <a href="#playground" onClick=${e => { e.preventDefault(); scrollTo('playground'); }}>Try it</a>
+        </nav>
+        <div className="spacer"></div>
+        <button className="btn btn-ghost btn-icon" aria-label="Settings and full tour" onClick=${() => A.set({settingsOpen: !S.settingsOpen})}><${Icon} n="gear" s=${19}/></button>
+      </div>
+    </header>
+
+    <${Story} onStart=${startQuick} onTour=${startTour} go=${scrollTo}/>
+
+    <section id="playground" className="wrap play">
+      <div className="play-head">
+        <h2 className="h">Spring campaign</h2>
+        <span className="cap">Brief: 6 stills in 4K and one 9:16 Reel. Fresh, bright, golden hour.</span>
+      </div>
+
+      <div className="bar">
+        <div className="blocks-bar" data-tour="palette" role="group" aria-label="Blocks. Tap to add, or drag onto a string.">
+          ${ORDER.map(k => {
+            const add = () => topId && A.insert(topId, k, null);
+            return html`<div key=${k} className="pchip" role="button" tabIndex="0" draggable="true" data-tour=${'pal-' + k} onDragStart=${dnd.start(k)} onDragEnd=${dnd.end} onClick=${add} onKeyDown=${e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); add(); } }} aria-label=${'Add ' + TYPES[k].title}>
+              <span className="itile"><${Icon} n=${k} s=${17}/></span>${TYPES[k].title}
+            </div>`;
+          })}
+          <button className="btn btn-ghost" style=${{flex:'none'}} onClick=${A.newFlow}>+ New flow</button>
+        </div>
+        ${S.delta ? html`<span key=${S.deltaKey} className="delta num" role="status">${(S.delta > 0 ? '+' : '−') + $(Math.abs(S.delta))}</span>` : null}
+        <button className="jar" data-tour="jar" aria-label=${'Credit jar: ' + (free < 0 ? $(-free) + ' over budget' : $(free) + ' left') + '. Show details.'} onClick=${() => A.set({jarOpen: !S.jarOpen})}>
+          <span className="jbar" aria-hidden="true"><span className="fill" style=${{width: Math.min(100, T.spent / st.budget * 100) + '%'}}></span><span className="plan" style=${{width: Math.max(0, Math.min(100 - T.spent / st.budget * 100, T.planned / st.budget * 100)) + '%'}}></span></span>
+          <span className="num"><b>${free < 0 ? $(-free) : $(free)}</b> <span className="cap">${free < 0 ? 'over' : 'left'}</span></span>
+        </button>
+      </div>
+
+      <div className="flows">
+        ${S.flows.slice().reverse().map(f => html`<${Flow} key=${f.id} f=${f} S=${S} A=${A} dnd=${dnd} $=${$} isTop=${f.id === topId} hint=${f.id === topId ? hint : null}/>`)}
+      </div>
+    </section>
+
+    ${S.jarOpen ? html`<${JarPop} S=${S} T=${T} $=${$} free=${free} A=${A}/>` : null}
+    ${S.picker ? html`<${Picker} S=${S} A=${A} $=${$} close=${() => A.set({picker:null})}/>` : null}
+    ${S.preflight ? html`<${Preflight} S=${S} A=${A} $=${$} T=${T} update=${update}/>` : null}
+    ${S.viewer ? html`<${Viewer} S=${S} A=${A} update=${update}/>` : null}
+    ${S.insert ? html`<${InsertMenu} S=${S} A=${A} close=${() => A.set({insert:null})}/>` : null}
+    ${S.flowMenu ? html`<${FlowMenu} S=${S} A=${A} close=${() => A.set({flowMenu:null})}/>` : null}
+    ${S.settingsOpen ? html`<${Settings} S=${S} A=${A} startTour=${startTour} startQuick=${startQuick} close=${() => A.set({settingsOpen:false})}/>` : null}
+    ${S.qs != null ? html`<${QuickStart} S=${S} A=${A} $=${$} startTour=${startTour}/>` : null}
+    ${S.tour != null ? html`<${Tour} S=${S} setS=${setS} A=${A}/>` : null}
+    ${S.toast ? html`<div key=${S.toast.key} className=${'toast' + (S.tour != null || S.qs != null ? ' up' : '')} role="status">${S.toast.text}</div>` : null}
+  `;
+}
+
+/* ---------------- landing ---------------- */
+function MiniFlow({ghost, seed}){
+  const steps = [{i:2, seed, v:0}, {i:2, seed, v:3}, {i:2, seed, v:3}, {i:2, seed, v:3}];
+  return html`<div className=${'mini-row' + (ghost ? ' ghost' : '')}>
+    ${steps.map((k, j) => html`<${React.Fragment} key=${j}><div className="mini"><div className="pic"><${Flower} k=${k}/></div></div><span className="mini-wire" aria-hidden="true"></span><//>`)}
+    <div className="mini deck"><div className="pic"><${Flower} k=${{i:2, seed, v:3}}/></div></div>
+  </div>`;
+}
+function Story({onStart, onTour, go}){
+  return html`<main id="story" className="wrap" style=${{scrollMarginTop:'60px'}}>
+    <div className="story">
+      <section className="hero">
+        <div>
+          <div className="eyebrow">Concept case study</div>
+          <h1>Plan the canvas before you paint.</h1>
+          <p className="lead">Build AI campaigns step by step, and see the price before you spend.</p>
+          <div className="ctas">
+            <button className="btn btn-primary btn-lg" onClick=${onStart}>Try it in 3 steps</button>
+            <button className="linkbtn" onClick=${() => go('playground')}>Or just look around</button>
+          </div>
+        </div>
+        <div className="hero-art" aria-label="Two flows of blocks, one above the other">
+          <div className="axis cap"><span>Steps, left to right →</span><span>Result</span></div>
+          <${MiniFlow} seed=${3}/>
+          <${MiniFlow} seed=${11} ghost=${true}/>
+          <div className="cap">↓ Alternatives to compare</div>
+        </div>
+      </section>
+
+      <section className="sec">
+        <div className="eyebrow">Why</div>
+        <h2>Most AI tools are one prompt box.</h2>
+        <div className="vs">
+          <div className="th">Today</div><div className="th">Blockflow</div>
+          <div>The process lives in your head.</div><div>The process is on screen, step by step.</div>
+          <div>You see the cost after you spend it.</div><div>Each step shows its price first.</div>
+          <div>A wrong format gets paid twice.</div><div>A quick check catches it first.</div>
+          <div>The team only sees the result.</div><div>The team compares whole directions.</div>
+        </div>
+      </section>
+
+      <section className="quote">
+        <blockquote>“If the frame is too thin or the paint too runny, you only notice when the picture is done.”</blockquote>
+        <p>Painters choose frame and paint first. In AI work, models, formats and credits are the frame and paint. Blockflow puts them on the canvas.</p>
+      </section>
+
+      <section className="sec">
+        <div className="eyebrow">How</div>
+        <h2>Work across, compare down.</h2>
+        <div className="two">
+          <div className="card">
+            <h3>Across: the steps</h3>
+            <p>Blocks connect from first idea to a finished campaign deck.</p>
+            <div className="chain">${['Moodboard','Image','Upscale','Video','Sound'].map(c => html`<span key=${c} className="chip">${c}</span>`)}<span className="chip ink">Deck</span></div>
+          </div>
+          <div className="card">
+            <h3>Down: the alternatives</h3>
+            <p>Remix a flow to try another direction. The team compares and picks one.</p>
+            <div className="stackviz" aria-hidden="true"><div><span>Flow C</span><span>$4.86</span></div><div><span>Flow B</span><span>$2.10</span></div><div><span>Flow A ★</span><span>$4.86</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="sec">
+        <div className="eyebrow">What changes</div>
+        <div className="four">
+          <div className="card"><span className="ic"><${Icon} n="price"/></span><h3>Price first</h3><p>Run shows the cost before it spends.</p></div>
+          <div className="card"><span className="ic"><${Icon} n="mood"/></span><h3>Explore cheap</h3><p>Try ideas cheaply, finish the best ones well.</p></div>
+          <div className="card"><span className="ic"><${Icon} n="shield"/></span><h3>Check first</h3><p>A quick check before expensive steps.</p></div>
+          <div className="card"><span className="ic"><${Icon} n="team"/></span><h3>Team in the loop</h3><p>Everyone sees the steps, not only the result.</p></div>
+        </div>
+      </section>
+
+      <section className="band">
+        <div><h2 className="h">Try it with flowers.</h2><p className="cap" style=${{margin:'4px 0 0'}}>All images are flower placeholders. Prices are samples.</p></div>
+        <div className="ctas"><button className="btn btn-primary btn-lg" onClick=${onStart}>Try it in 3 steps</button><button className="btn btn-lg" onClick=${onTour}>Full tour</button></div>
+      </section>
+    </div>
+  </main>`;
+}
+
+/* ---------------- flow ---------------- */
+function Flow({f, S, A, dnd, $, isTop, hint}){
+  const r = computeFlow(f);
+  const d = deckOf(f);
+  const kept = S.kept === f.id;
+  const empty = f.blocks.length === 0;
+  const tourKey = isTop ? 'top' : (f.id === 1 ? 'a' : 'f' + f.id);
+  const nextId = isTop ? nextStepId(f) : null;
+  let sugg = null;
+  if (isTop && !nextId && S.qs == null && S.tour == null && !f.blocks.some(b => b.busy)){
+    const NEXT = {mood:'stills', stills:'up', up:'motion', motion:'sound'};
+    const reals = f.blocks.filter(b => b.type !== 'prompt');
+    const last = reals[reals.length - 1];
+    if (!last) sugg = null;
+    else if (NEXT[last.type]){
+      const nt = NEXT[last.type];
+      const needPicks = (last.type === 'mood' || last.type === 'stills') && last.ran && last.picks.length === 0;
+      const why = {stills:'turns your ♥ into finished pictures', up:'makes your picks sharp, up to 4K', motion:'turns your images into a Reel', sound:'adds music to the Reel'}[nt];
+      sugg = {text: (needPicks ? 'Tap ♥ on what you like. Next, ' : 'Next: ') + TYPES[nt].title + ' ' + why + '.', label:'Add ' + TYPES[nt].title, go: () => A.insert(f.id, nt, null)};
+    } else sugg = {text:'This flow is complete. Watch the Reel in the deck, or remix it.'};
+  }
+  const status = kept ? '★ Team pick' : (f.from ? 'Remix of ' + f.from : (isTop ? 'Latest' : ''));
+  return html`<section className=${'flow' + (isTop ? ' top' : '') + (kept ? ' kept' : '')} aria-label=${f.name} data-tour=${tourKey + '-flow'}>
+    <div className="flow-head">
+      <h3 className="h">${f.name}</h3>
+      ${status ? html`<span className="cap">${status}</span>` : null}
+      <div className="flow-tools">
+        ${f.votes.length ? html`<span className="voters" title=${'Votes: ' + f.votes.map(p => PEOPLE[p].name).join(', ')}>${f.votes.map(p => html`<span key=${p} className="av" style=${{background: PEOPLE[p].bg, color: PEOPLE[p].fg}}>${p}</span>`)}</span>` : null}
+        <button className="btn" data-tour=${tourKey + '-remix'} onClick=${() => A.remix(f.id)}><${Icon} n="remix" s=${16}/>Remix</button>
+        <button className="btn btn-icon btn-ghost" aria-label=${'More for ' + f.name} onClick=${e => { const rc = e.currentTarget.getBoundingClientRect(); A.set({flowMenu:{fid:f.id, x:rc.right, y:rc.bottom, t:rc.top}}); }}>⋯</button>
+      </div>
+    </div>
+    ${sugg ? html`<div className="tipline" role="note"><span>${sugg.text}</span>${sugg.go ? html`<button className="btn btn-primary" onClick=${sugg.go}>${sugg.label}</button>` : null}</div>` : null}
+    ${!sugg && hint ? html`<div className="tipline" role="note"><span>${hint.text}</span>
+      ${hint.act === 'price' ? html`<button className="btn btn-ghost" onClick=${() => { A.togglePrice(f.id, true); A.seeHint(hint.id); }}>Show me</button>` : null}
+      <button className="btn btn-ghost" onClick=${() => A.seeHint(hint.id)}>Got it</button></div>` : null}
+    <div className="row-scroll">
+      <div className="row">
+        ${f.blocks.map((b, idx) => html`<${React.Fragment} key=${b.id}>
+          <${Block} f=${f} b=${b} idx=${idx} info=${r.info[b.id]} S=${S} A=${A} $=${$} tourKey=${tourKey} isNext=${b.id === nextId}/>
+          <${Wire} f=${f} b=${b} idx=${idx} S=${S} A=${A} dnd=${dnd} tourKey=${tourKey}/>
+        <//>`)}
+        ${empty ? html`<${React.Fragment}>
+          <div className=${'empty' + (S.dropOn === 'e' + f.id ? ' drop' : '')} onDragOver=${dnd.over('e' + f.id)} onDragLeave=${dnd.leave('e' + f.id)} onDrop=${dnd.drop(f.id, null)}>
+            <span>Start with a moodboard.</span>
+            <button className="btn btn-primary" onClick=${() => A.insert(f.id, 'mood', null)}>Add Moodboard</button>
+          </div>
+          <div className="wire" aria-hidden="true"><svg width="68" height="60" viewBox="0 0 68 60"><path d="M5 30 C 24 50, 44 50, 63 30" stroke="var(--line-2)" stroke-width="2" fill="none" stroke-dasharray="2 6" stroke-linecap="round"/></svg></div>
+        <//>` : null}
+        <${Deck} f=${f} d=${d} r=${r} S=${S} A=${A} dnd=${dnd} $=${$} tourKey=${tourKey}/>
+      </div>
+    </div>
+  </section>`;
+}
+
+function HeartTile({k, picked, onClick, label, tall, delay}){
+  return html`<button className=${'tile in zoomable' + (tall ? ' tall' : '') + (picked ? ' liked' : '')} style=${{animationDelay: delay}} aria-label=${'Open ' + label + ' big' + (picked ? ', liked' : '')} onClick=${onClick}>
+    <${Flower} k=${k}/>${picked ? html`<span className="heart" aria-hidden="true"><svg viewBox="0 0 24 24"><path d=${HEART} fill="#1B1B1A"/></svg></span>` : null}
+  </button>`;
+}
+
+function Block({f, b, idx, info, S, A, $, tourKey, isNext}){
+  const t = TYPES[b.type], m = MODELS[b.model];
+  const live = b.ran && !b.busy;
+  const nextReal = nextRealOf(f, idx);
+  const first = f.blocks.findIndex(x => x.type === b.type) === idx;
+  const tk = first ? tourKey + '-' + b.type : null;
+  const playKey = 'b-' + f.id + '-' + b.id;
+  const playing = S.playing === playKey;
+  const ghost = (w, h, i) => html`<span key=${'g' + i} className=${'tile ghost' + (b.busy ? ' busy' : '')} style=${{width:w, height:h, animationDelay:(i * 0.05) + 's'}}></span>`;
+  let body = null, sub = t.job;
+
+  if (b.type === 'mood'){
+    const n = live ? b.items.length : info.count;
+    sub = live ? 'Tap an idea to see it big' : t.job;
+    body = html`
+      <div className="tiles" data-tour=${tk ? tk + '-tiles' : null}>
+        ${range(Math.min(n, 15)).map(i => live
+          ? html`<${HeartTile} key=${b.runs + '-' + i} k=${b.items[i]} picked=${b.picks.indexOf(i) >= 0} label=${'idea ' + (i + 1)} delay=${(i * 0.025) + 's'} onClick=${() => A.openViewer({fid:f.id, kind:'image', src:'block', bid:b.id, i})}/>`
+          : ghost('44px', '44px', i))}
+      </div>
+      ${n > 15 ? html`<span className="cap">+${n - 15} more</span>` : null}
+      <div className="refs">
+        ${b.refs.map((rf, i) => html`<button key=${i} className="ref zoomable" style=${{padding:0,border:'none',position:'relative'}} aria-label=${'Open reference ' + (i + 1) + ' big'} onClick=${() => A.openViewer({fid:f.id, kind:'image', src:'ref', bid:b.id, i})}>${rf.src ? html`<img src=${rf.src} alt=""/>` : html`<${Flower} k=${rf.k}/>`}</button>`)}
+        <label className="upload"><${Icon} n="upl" s=${14}/>${b.refs.length ? 'Add' : 'Add your own photos'}<input type="file" accept="image/*" multiple onChange=${e => A.upload(f.id, b.id, e)} aria-label="Upload reference photos"/></label>
+      </div>`;
+  } else if (b.type === 'stills'){
+    if (live){
+      const per = Math.max(1, b.per || 1), groups = Math.ceil(b.items.length / per);
+      sub = 'Tap to check, ♥ the keepers';
+      body = html`<div className="stack">${range(Math.min(groups, 4)).map(g => html`<div key=${g} className="srow">
+          <span className="src"><${Flower} k=${Object.assign({}, b.items[g * per], {v:0, tint:null})}/></span>
+          <span className="arrow"><${Icon} n="arrow" s=${14}/></span>
+          ${range(per).map(k => { const i = g * per + k; return html`<${HeartTile} key=${b.runs + '-' + i} tall=${true} k=${b.items[i]} picked=${b.picks.indexOf(i) >= 0} label=${'image ' + (i + 1)} delay=${(i * 0.03) + 's'} onClick=${() => A.openViewer({fid:f.id, kind:'image', src:'block', bid:b.id, i})}/>`; })}
+        </div>`)}${groups > 4 ? html`<span className="cap">+${groups - 4} more</span>` : null}</div>`;
+    } else {
+      const g = info.locked ? 2 : Math.min(info.inp || 4, 4);
+      if (info.locked) sub = 'Uses your ♥ from the step before';
+      body = html`<div className="stack">${range(g).map(r => html`<div key=${r} className="srow"><span className="src ghostbox"></span><span className="arrow"><${Icon} n="arrow" s=${14}/></span>${range(b.n).map(k => ghost('44px', '55px', r * b.n + k))}</div>`)}</div>`;
+    }
+  } else if (b.type === 'up'){
+    const n = live ? b.items.length : info.count;
+    const res = live ? (b.res || '4K') : (m.res || '4K');
+    body = html`<div className="stack">${range(Math.min(Math.max(n, 1), 3)).map(i => html`<div key=${b.runs + '-' + i} className="pair">
+        ${live ? html`<span className="lo"><${Flower} k=${b.items[i]}/></span>` : html`<span className="lo ghostbox" style=${{filter:'none'}}></span>`}
+        <span className="arrow"><${Icon} n="arrow" s=${14}/></span>
+        ${live ? html`<button className="hi zoomable" style=${{padding:0,border:'none'}} aria-label=${'Open upscale ' + (i + 1) + ' big'} onClick=${() => A.openViewer({fid:f.id, kind:'image', src:'block', bid:b.id, i})}><${Flower} k=${b.items[i]}/><span className="tag4">${res}</span></button>` : html`<span className=${'hi ghostbox' + (b.busy ? ' busy' : '')}></span>`}
+      </div>`)}${n > 3 ? html`<span className="cap">+${n - 3} more</span>` : null}</div>`;
+    sub = live ? n + ' images, now ' + res : t.job;
+  } else if (b.type === 'motion'){
+    const asp = live ? b.aspectRan : b.aspect;
+    const dim = {'9:16':[90,160],'1:1':[140,140],'16:9':[246,138]}[asp] || [90,160];
+    body = html`
+      <div className="seg" role="group" aria-label="Video format">${['9:16','1:1','16:9'].map(a => html`<button key=${a} aria-pressed=${b.aspect === a} onClick=${() => A.setAspect(f.id, b.id, a)}>${a}</button>`)}</div>
+      <div className="screen" style=${{width: dim[0] + 'px', height: dim[1] + 'px', border: live ? 'none' : '1.5px dashed var(--line-2)', background: live ? 'var(--field)' : 'transparent', animation: b.busy ? 'shimmer .9s ease infinite' : 'none'}}>
+        ${live ? html`<${React.Fragment}><${Flower} k=${b.item} anim=${playing} drift=${playing}/>
+          <button className="playbtn" aria-label=${playing ? 'Pause' : 'Play'} onClick=${() => A.play(playKey, deckOf(f).sound)}><span style=${{opacity: playing ? 0.2 : 1}}><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d=${playing ? PAUSE : PLAY} fill="#FFFFFF"/></svg></span></button><//>`
+        : html`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--line-2)" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d=${PLAY}/></svg>`}
+      </div>
+      ${live ? html`<div className="prog"><i key=${playing ? 'on' : 'off'} className=${playing ? 'run' : ''}></i></div>` : null}`;
+    sub = live ? (deckOf(f).sound ? 'Tap play · with sound' : 'Tap play · no sound yet') : t.job;
+  } else if (b.type === 'sound'){
+    const hs = [10,18,28,16,24,34,22,12,30,18,26,10,16,30,14,22,32,20];
+    const changed = live && b.model !== (b.modelRan || b.model);
+    body = html`<div className="track">
+        <button className=${'btn pb ' + (live ? 'btn-primary' : '')} disabled=${!live} aria-label=${playing ? 'Pause' : 'Play'} onClick=${() => A.play(playKey, b)}><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d=${playing ? PAUSE : PLAY} fill="currentColor"/></svg></button>
+        <div className=${'wave' + (live ? ' live' : '') + (playing ? ' on' : '')} aria-hidden="true">${hs.map((h, i) => html`<span key=${i} className=${i < 11 ? 'lit' : ''} style=${{height: (live ? hs[(i + b.seed) % hs.length] : 6) + 'px', animationDelay: (i * 0.04) + 's'}}></span>`)}</div>
+      </div>`;
+    sub = changed ? 'Run again to hear ' + m.name : (live ? 'Tap play to listen' : t.job);
+  } else if (b.type === 'prompt'){
+    const tgt = nextReal ? TYPES[nextReal.type].title : 'the next step';
+    sub = 'Sent to ' + tgt;
+    body = html`
+      <textarea className="prompt" id=${'p-' + b.id} rows="3" value=${b.text} placeholder="Describe the look you want" aria-label=${'What you want for ' + tgt} onChange=${e => A.setText(f.id, b.id, e.target.value)}></textarea>
+      <div className="chips">${['golden hour','yellow petals','night sky'].map(c => html`<button key=${c} onClick=${() => A.addChip(f.id, b.id, c)}>+ ${c}</button>`)}</div>
+      ${live && b.out ? html`<div className="sent"><b>Sent:</b> ${b.out}</div>` : null}`;
+  }
+
+  let note = '';
+  if (live && (b.type === 'mood' || b.type === 'stills')){
+    const k = b.picks.length;
+    if (k && nextReal) note = k + ' ♥ go to ' + TYPES[nextReal.type].title;
+    else if (k) note = k + ' ♥ · add a next step to use them';
+  }
+  const locked = info.locked;
+  const est = !b.ran && info.est;
+  const priceText = info.cost ? (est ? '≈ ' : '') + $(info.cost) : 'Free';
+  const label = b.busy ? 'Working…' : (locked ? info.lockText : (b.type === 'prompt' ? (b.ran ? 'Send again' : 'Send prompt') : (b.ran ? 'Run again' : 'Run')));
+  const cls = 'btn btn-wide ' + (isNext ? 'btn-primary' : (b.ran ? 'btn-ghost' : ''));
+
+  return html`<article className=${'block' + (b.busy ? ' busy' : '')} aria-label=${t.title} data-tour=${tk}>
+    <div className="bhead">
+      <span className="itile"><${Icon} n=${b.type} s=${17}/></span>
+      <span className="tt"><span className="t">${t.title}</span><span className="cap">${sub}</span></span>
+      <button className="xbtn" aria-label=${'Remove ' + t.title} onClick=${() => A.remove(f.id, b.id)}><${Icon} n="x" s=${15}/></button>
+    </div>
+    ${body}
+    ${t.step ? html`<div className="ctl-row"><span className="cap">${t.step.label}</span><div className="stepper">
+      <button aria-label=${'Fewer: ' + t.step.label} onClick=${() => A.setN(f.id, b.id, Math.max(t.step.min, b.n - t.step.by))}>−</button>
+      <span className="v num">${b.n}</span>
+      <button aria-label=${'More: ' + t.step.label} onClick=${() => A.setN(f.id, b.id, Math.min(t.step.max, b.n + t.step.by))}>+</button>
+    </div></div>` : null}
+    ${info.promptIn ? html`<div className="pin"><${Icon} n="prompt" s=${13}/><span>${info.promptIn}</span></div>` : null}
+    ${b.busy ? html`<div className="busyline" role="status"><i></i>${b.type === 'prompt' ? 'Sending…' : 'Making ' + info.count + ' ' + t.unit + '…'}</div>` : (note ? html`<span className="cap" style=${{color:'var(--ink)',fontWeight:600}}>${note}</span>` : null)}
+    <div className="foot" data-tour=${tk ? tk + '-foot' : null}>
+      <button className="model" aria-label=${'Model: ' + m.name + '. Change'} onClick=${() => A.openPicker(f.id, b.id)}><b>${m.name}</b><span className="num">${m.cr ? $(m.cr) + ' each' : 'free'}</span><span className="arrow"><${Icon} n="chev" s=${14}/></span></button>
+      <div className="price"><span className="cap">${b.ran ? 'Again' : (est ? 'About' : 'Price')}</span><b className="num">${priceText}</b></div>
+      <button className=${cls} disabled=${locked || b.busy} onClick=${() => A.run(f.id, b.id)} data-tour=${tk ? tk + '-run' : null}>${label}</button>
+    </div>
+  </article>`;
+}
+
+function Wire({f, b, idx, S, A, dnd, tourKey}){
+  const t = TYPES[b.type];
+  const next = f.blocks[idx + 1];
+  const live = b.ran && !b.busy;
+  const active = live && !((b.type === 'mood' || b.type === 'stills') && b.picks.length === 0);
+  let lab = '';
+  if ((b.type === 'mood' || b.type === 'stills') && live && b.picks.length) lab = b.picks.length + ' ♥';
+  const key = 'w' + f.id + '-' + (idx + 1);
+  const drop = S.dropOn === key;
+  const open = S.insert && S.insert.fid === f.id && S.insert.at === idx + 1;
+  const nextTitle = next ? TYPES[next.type].title : 'the deck';
+  return html`<div className=${'wire' + (drop ? ' drop' : '') + (open ? ' hot' : '')} onDragOver=${dnd.over(key)} onDragLeave=${dnd.leave(key)} onDrop=${dnd.drop(f.id, idx + 1)} data-tour=${idx === 0 ? tourKey + '-wire1' : null}>
+    ${lab ? html`<span className="wl num" aria-hidden="true">${lab}</span>` : null}
+    <svg width="68" height="60" viewBox="0 0 68 60" aria-hidden="true">
+      <path className=${active ? 'flowpath' : ''} d="M5 30 C 24 50, 44 50, 63 30" stroke=${active || drop ? 'var(--ink)' : 'var(--line-2)'} stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray=${active ? '6 6' : '2 6'}/>
+      <circle cx="5" cy="30" r="4.5" fill=${live ? 'var(--ink)' : 'var(--line-2)'}/>
+      <circle cx="63" cy="30" r="4.5" fill="var(--line-2)"/>
+    </svg>
+    <button className="plus" aria-label=${'Add a step between ' + t.title + ' and ' + nextTitle} aria-expanded=${open} onClick=${e => A.openInsert(f.id, idx + 1, e.currentTarget.getBoundingClientRect(), nextTitle)}><span>+</span></button>
+  </div>`;
+}
+
+function Deck({f, d, r, S, A, dnd, $, tourKey}){
+  const key = 'd' + f.id;
+  const drop = S.dropOn === key;
+  const asp = d.reel ? d.reel.aspectRan : (d.mo ? d.mo.aspect : '9:16');
+  const vd = {'9:16':[70,124],'1:1':[92,92],'16:9':[92,52]}[asp] || [70,124];
+  const finals = d.finals.slice(0, 6);
+  const nF = d.finals.length;
+  const ticks = [
+    {ok: nF >= 6, l: (nF >= 6 ? 6 : nF) + ' of 6 stills'},
+    {ok: !!(d.up && d.up.ran && d.up.res !== '2K'), l: '4K'},
+    {ok: !!(d.reel && d.reel.aspectRan === '9:16'), l: d.reel && d.reel.aspectRan !== '9:16' ? 'Reel is ' + d.reel.aspectRan + ', needs 9:16' : 'Reel 9:16'},
+    {ok: !!d.sound, l: 'Sound', opt:true}
+  ];
+  const open = !!S.priceOpen[f.id];
+  let projAll = 0; f.blocks.forEach(b => { projAll += r.info[b.id].cost; });
+  let tip = null, bestSave = 0;
+  f.blocks.forEach(b => {
+    const t = TYPES[b.type]; if (t.role !== 'Extra') return;
+    const inf = r.info[b.id]; const cheapest = t.list.slice().sort((x, y) => MODELS[x].cr - MODELS[y].cr)[0];
+    const save = inf.cost - inf.count * MODELS[cheapest].cr;
+    if (save > bestSave){ bestSave = save; tip = {text: t.title + ' is an extra here. A cheaper model saves ' + $(save) + '.', label:'Save ' + $(save), go: () => A.setModel(f.id, b.id, cheapest)}; }
+  });
+  if (!tip) f.blocks.forEach(b => {
+    const t = TYPES[b.type]; if (t.role !== 'Main' || tip) return;
+    const inf = r.info[b.id]; const sorted = t.list.slice().sort((x, y) => MODELS[x].cr - MODELS[y].cr);
+    if (sorted.indexOf(b.model) === 0 && b.model !== t.rec){ const add = inf.count * (MODELS[t.rec].cr - MODELS[b.model].cr); tip = {text: t.title + ' is what people see. More detail costs ' + $(add) + '.', label:'Upgrade', go: () => A.setModel(f.id, b.id, t.rec)}; }
+  });
+  if (!tip && f.blocks.length) tip = {text:'Good balance: strong models where it shows, cheap ones elsewhere.'};
+
+  return html`<article className=${'deck' + (drop ? ' drop' : '')} aria-label=${f.name + ' campaign deck'} onDragOver=${dnd.over(key)} onDragLeave=${dnd.leave(key)} onDrop=${dnd.drop(f.id, null)} data-tour=${tourKey + '-deck'}>
+    <div className="deck-head">
+      <span className="itile"><${Icon} n="deck" s=${17}/></span>
+      <h4 className="h" style=${{flex:1}}>Campaign deck</h4>
+      <span className="num" style=${{fontWeight:700}}>${$(r.proj)}</span>
+    </div>
+    ${f.blocks.length === 0 ? html`<p className="cap" style=${{margin:0}}>Your finished stills and Reel will show up here.</p>` : html`<${React.Fragment}>
+      <div className="media">
+        <div className="fgrid">${range(6).map(i => i < finals.length
+          ? html`<button key=${i} className="final" aria-label=${'Open image ' + (i + 1)} onClick=${() => A.openViewer({fid:f.id, kind:'image', src:'deck', i})}><${Flower} k=${finals[i]}/></button>`
+          : html`<span key=${i} className="final empty-slot" aria-hidden="true"></span>`)}</div>
+        <div className="reelcol" data-tour=${tourKey + '-reel'}>
+          ${d.reel ? html`<button className="reel" style=${{width: vd[0] + 'px', height: vd[1] + 'px'}} aria-label=${'Watch the Reel' + (d.sound ? ' with sound' : '')} onClick=${() => A.openViewer({fid:f.id, kind:'reel'}, d.sound)}>
+              <${Flower} k=${d.reel.item}/><span className="playbtn" aria-hidden="true"><span style=${{width:'34px',height:'34px'}}><svg width="13" height="13" viewBox="0 0 24 24"><path d=${PLAY} fill="#FFFFFF"/></svg></span></span>
+            </button>` : html`<span className="reel none" style=${{width: vd[0] + 'px', height: vd[1] + 'px'}} aria-hidden="true"></span>`}
+          <span className="cap">${d.reel ? (d.sound ? 'Reel ♪' : 'Reel') : 'Reel'}</span>
+        </div>
+      </div>
+      ${nF === 0 ? html`<p className="cap" style=${{margin:0}}>Tap ♥ on images you like. They land here.</p>` : null}
+      <div className="ticks" aria-label="Against the brief">${ticks.map(tk => html`<span key=${tk.l} className=${'tick' + (tk.ok ? ' ok' : '')}><i aria-hidden="true">${tk.ok ? '✓' : ''}</i>${tk.l}${tk.opt && !tk.ok ? ' (optional)' : ''}</span>`)}</div>
+      <button className="disclose" aria-expanded=${open} onClick=${() => A.togglePrice(f.id)} data-tour=${tourKey + '-price'}>Play with the price<${Icon} n="chev" s=${16}/></button>
+      ${open ? html`<div className="pricebox">
+        <div className="seg" role="group" aria-label="Quick presets">${Object.keys(PRESETS).map(k => { const on = f.blocks.every(b => PRESETS[k].m[b.type] === b.model); return html`<button key=${k} aria-pressed=${on} onClick=${() => A.preset(f.id, k)}>${PRESETS[k].label}</button>`; })}</div>
+        ${f.blocks.map(b => {
+          const t = TYPES[b.type], inf = r.info[b.id];
+          const sorted = t.list.slice().sort((x, y) => MODELS[x].cr - MODELS[y].cr);
+          const pos = sorted.indexOf(b.model);
+          return html`<div key=${b.id} className="trade">
+            <span className="n"><span>${t.title} <span className="role">${t.role}</span></span><span className="cap">${MODELS[b.model].name}</span></span>
+            <span className="step"><button disabled=${pos <= 0} aria-label=${'Cheaper model for ' + t.title} onClick=${() => A.setModel(f.id, b.id, sorted[pos - 1])}>‹</button><button disabled=${pos >= sorted.length - 1} aria-label=${'Better model for ' + t.title} onClick=${() => A.setModel(f.id, b.id, sorted[pos + 1])}>›</button></span>
+            <span className="c num">${inf.cost ? $(inf.cost) : 'Free'}</span>
+            <span className="share" aria-hidden="true"><i style=${{width: (projAll > 0 ? Math.max(2, inf.cost / projAll * 100) : 0) + '%'}}></i></span>
+          </div>`;
+        })}
+        ${tip ? html`<div className="tip"><span style=${{flex:1}}>${tip.text}</span>${tip.go ? html`<button className="btn" onClick=${tip.go}>${tip.label}</button>` : null}</div>` : null}
+      </div>` : null}
+    <//>`}
+  </article>`;
+}
+
+/* ---------------- overlays ---------------- */
+function JarPop({S, T, $, free, A}){
+  const st = S.settings;
+  return html`<${React.Fragment}>
+    <button className="clickaway" aria-label="Close" onClick=${() => A.set({jarOpen:false})}></button>
+    <div className="panel-pop" role="dialog" aria-label="Credit jar" style=${{top:'calc(env(safe-area-inset-top,0px) + var(--topbar-h, 61px) + 70px)', right:'max(16px, env(safe-area-inset-right,0px))'}}>
+      <h3 className="h">Credit jar</h3>
+      <p className="cap" style=${{margin:0}}>One budget for the whole project. Decide once, then create.</p>
+      <div className="kv"><span>This month</span><b className="num">${$(st.budget)}</b></div>
+      <div className="kv"><span>Spent</span><b className="num">${$(T.spent)}</b></div>
+      <div className="kv"><span>Planned in the latest flow</span><b className="num">${$(T.planned)}</b></div>
+      <div className="kv"><span>${free < 0 ? 'Over budget' : 'Left'}</span><b className="num">${$(Math.abs(free))}</b></div>
+      <button className="btn" onClick=${() => A.set({jarOpen:false, settingsOpen:true})}>Change budget</button>
+    </div>
+  <//>`;
+}
+
+function Picker({S, A, $, close}){
+  const f = S.flows.find(x => x.id === S.picker.fid); const b = f && f.blocks.find(x => x.id === S.picker.bid);
+  if (!b) return null;
+  const t = TYPES[b.type]; const inf = computeFlow(f).info[b.id];
+  return html`<div className="backdrop" onClick=${e => { if (e.target === e.currentTarget) close(); }}>
+    <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="pk-t">
+      <div className="sheet-head"><h3 id="pk-t" className="h" style=${{flex:1}}>${t.title} model</h3><button className="btn btn-ghost btn-icon" aria-label="Close" onClick=${close}><${Icon} n="x" s=${17}/></button></div>
+      <div className="sheet-body">
+        ${t.list.map(k => { const mm = MODELS[k]; const on = b.model === k; return html`<button key=${k} className="mrow" aria-pressed=${on} onClick=${() => A.setModel(f.id, b.id, k)}>
+          <span style=${{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:'2px'}}>
+            <span style=${{fontWeight:600}}>${mm.name}${k === t.rec ? html`<span className="rec">Suggested</span>` : null}</span>
+            <span className="cap"><span className="qdots" role="img" aria-label=${'Detail ' + mm.q + ' of 5'}>${range(5).map(i => html`<i key=${i} className=${i < mm.q ? 'on' : ''}></i>`)}</span> ${mm.tag}</span>
+          </span>
+          <b className="num">${mm.cr ? $(mm.cr * inf.count) : 'Free'}</b>
+          <span aria-hidden="true" style=${{width:'18px'}}>${on ? '✓' : ''}</span>
+        </button>`; })}
+      </div>
+    </div>
+  </div>`;
+}
+
+function Preflight({S, A, $, T, update}){
+  const f = S.flows.find(x => x.id === S.preflight.fid); const b = f && f.blocks.find(x => x.id === S.preflight.bid);
+  if (!b) return null;
+  const inf = computeFlow(f).info[b.id];
+  const cost = inf.cost, left = S.settings.budget - T.spent - cost;
+  const items = [
+    b.aspect === '9:16' ? {ok:true, t:'Format 9:16 fits the brief'} : {ok:false, t:'Format is ' + b.aspect + '. The brief needs 9:16.', fix:true},
+    {ok:true, t:inf.count + ' × ' + MODELS[b.model].name},
+    left >= 0 ? {ok:true, t:$(left) + ' left after this'} : {ok:false, t:'This goes ' + $(-left) + ' over your budget'}
+  ];
+  const allOk = items.every(i => i.ok);
+  const close = () => update(n => { n.preflight = null; });
+  return html`<div className="backdrop" onClick=${e => { if (e.target === e.currentTarget) close(); }}>
+    <div className="sheet" role="dialog" aria-modal="true" aria-labelledby="pf-t" style=${{maxWidth:'440px'}}>
+      <div style=${{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}}>
+        <h3 id="pf-t" className="h">Quick check before you spend <span className="num">${$(cost)}</span></h3>
+        <ul className="pf">${items.map(i => html`<li key=${i.t} className=${i.ok ? '' : 'need'}>
+          <span style=${{flex:'none',marginTop:'2px'}}><${Icon} n=${i.ok ? 'check' : 'warn'} s=${18} w=${2.2}/></span>
+          <div style=${{display:'flex',flexDirection:'column',gap:'8px',flex:1}}><span>${i.t}</span>
+            ${i.fix ? html`<button className="btn btn-primary" style=${{alignSelf:'flex-start'}} onClick=${() => A.setAspect(f.id, b.id, '9:16')}>Switch to 9:16</button>` : null}</div>
+        </li>`)}</ul>
+        <label style=${{display:'flex',gap:'10px',alignItems:'center',minHeight:'44px',cursor:'pointer'}}><input type="checkbox" checked=${S.dontAsk} onChange=${() => update(n => { n.dontAsk = !n.dontAsk; })} style=${{width:'20px',height:'20px',accentColor:'var(--ink)'}}/>Don't ask again</label>
+        <div style=${{display:'flex',gap:'8px',flexWrap:'wrap',justifyContent:'flex-end'}}>
+          <button className="btn btn-ghost" onClick=${() => update(n => { n.preflight = null; n.picker = {fid:f.id, bid:b.id}; })}>Other models</button>
+          <button className="btn" onClick=${close}>Cancel</button>
+          <button className=${'btn ' + (allOk ? 'btn-primary' : '')} onClick=${() => A.run(f.id, b.id, true)}>${allOk ? 'Make video' : 'Make it anyway'}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function viewerSet(S, v){
+  const f = S.flows.find(x => x.id === v.fid); if (!f) return null;
+  if (v.src === 'block' || v.src === 'ref'){
+    const b = f.blocks.find(x => x.id === v.bid); if (!b) return null;
+    const t = TYPES[b.type];
+    if (v.src === 'ref') return {f, b, items: b.refs.map(r => r.src ? {img:r.src} : {k:r.k}), title:'Your references', model:'', likeable:false, square:true};
+    return {f, b, items: b.items.map(k => ({k})), title: t.title, model: MODELS[b.model].name, likeable: b.ran && !b.busy && (b.type === 'mood' || b.type === 'stills'), square: b.type === 'mood', upscale: b.type === 'up' ? (b.res || '4K') : ''};
+  }
+  const d = deckOf(f);
+  return {f, b:null, items: d.finals.map(k => ({k})), title:'Campaign deck', model: d.model, likeable:false, square:false};
+}
+function Viewer({S, A, update}){
+  const v = S.viewer;
+  const [zoom, setZoom] = useState(null);
+  const [before, setBefore] = useState(false);
+  const set = v.kind === 'image' ? viewerSet(S, v) : null;
+  const n = set ? set.items.length : 0;
+  const i = n ? ((v.i % n) + n) % n : 0;
+  const go = d => { setZoom(null); setBefore(false); update(x => { x.viewer.i = i + d; }); };
+  const like = () => { if (set && set.likeable) A.pick(set.f.id, set.b.id, i); };
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key === 'Escape') A.closeViewer();
+      if (v.kind !== 'image') return;
+      if (e.key === 'ArrowRight') go(1);
+      if (e.key === 'ArrowLeft') go(-1);
+      if ((e.key === 'l' || e.key === 'L') && set && set.likeable) like();
+    };
+    window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey);
+  });
+  const f = S.flows.find(x => x.id === v.fid);
+  if (!f) return null;
+  let stage = null, cap = '';
+  if (v.kind === 'image' && n){
+    const it = set.items[i];
+    const liked = set.likeable && set.b.picks.indexOf(i) >= 0;
+    const likes = set.likeable ? set.b.picks.length : 0;
+    const onFrame = e => {
+      if (zoom){ setZoom(null); return; }
+      const r = e.currentTarget.getBoundingClientRect();
+      setZoom({x: ((e.clientX - r.left) / r.width * 100).toFixed(1), y: ((e.clientY - r.top) / r.height * 100).toFixed(1)});
+    };
+    cap = set.title + ' · ' + (i + 1) + ' of ' + n + (set.model ? ' · ' + set.model : '') + (set.upscale ? ' · ' + (before ? 'before' : 'after, ' + set.upscale) : '');
+    const pic = it.img ? html`<img src=${it.img} alt=${'Reference ' + (i + 1)}/>` : html`<${Flower} k=${it.k}/>`;
+    stage = html`<${React.Fragment}>
+      <div className="vstage">
+        ${n > 1 ? html`<button className="btn btn-icon" aria-label="Previous image" onClick=${() => go(-1)}>‹</button>` : null}
+        <div className=${'vframe' + (set.square ? ' sq' : '') + (zoom ? ' zoomed' : '')} role="button" tabIndex="0" aria-label=${zoom ? 'Zoom out' : 'Zoom in'} onClick=${onFrame} onKeyDown=${e => { if (e.key === 'Enter') setZoom(zoom ? null : {x:50, y:50}); }}>
+          <div className=${'zin' + (before ? ' soft' : '')} style=${{transform: zoom ? 'scale(2.4)' : 'none', transformOrigin: zoom ? zoom.x + '% ' + zoom.y + '%' : '50% 50%'}}>${pic}</div>
+          ${liked ? html`<span className="heart" style=${{width:'28px',height:'28px',top:'12px',right:'12px'}} aria-hidden="true"><svg viewBox="0 0 24 24" style=${{width:'15px',height:'15px'}}><path d=${HEART} fill="#1B1B1A"/></svg></span>` : null}
+        </div>
+        ${n > 1 ? html`<button className="btn btn-icon" aria-label="Next image" onClick=${() => go(1)}>›</button>` : null}
+      </div>
+      <div className="vbar">
+        ${set.likeable ? html`<button className=${'btn likebtn ' + (liked ? '' : 'btn-primary')} aria-pressed=${liked} onClick=${like}><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d=${HEART} fill=${liked ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2"/></svg>${liked ? 'Liked' : 'Like'}</button>` : null}
+        ${set.upscale ? html`<div className="seg" role="group" aria-label="Compare"><button aria-pressed=${before} onClick=${() => setBefore(true)}>Before</button><button aria-pressed=${!before} onClick=${() => setBefore(false)}>After · ${set.upscale}</button></div>` : null}
+        <span className="cap">${zoom ? 'Tap the image to zoom out' : 'Tap the image to zoom in'}${set.likeable ? ' · ' + likes + ' ♥ so far' : ''}</span>
+      </div>
+      ${n > 1 ? html`<div className="strip" role="group" aria-label="All images">${set.items.map((x, j) => html`<button key=${j} aria-current=${j === i} aria-label=${'Show ' + (j + 1)} onClick=${() => { setZoom(null); update(y => { y.viewer.i = j; }); }}>
+        ${x.img ? html`<img src=${x.img} alt=""/>` : html`<${Flower} k=${x.k}/>`}
+        ${set.likeable && set.b.picks.indexOf(j) >= 0 ? html`<span className="heart" aria-hidden="true"><svg viewBox="0 0 24 24"><path d=${HEART} fill="#1B1B1A"/></svg></span>` : null}
+      </button>`)}</div>` : null}
+    <//>`;
+  } else if (v.kind === 'reel'){
+    const d = deckOf(f);
+    if (d.reel){
+      const key = 'view-' + f.id, on = S.playing === key;
+      const a = d.reel.aspectRan;
+      const size = a === '16:9' ? {width:'min(88vw, 900px)', aspectRatio:'16 / 9'} : (a === '1:1' ? {height:'min(64vh, 560px)', aspectRatio:'1 / 1'} : {height:'min(70vh, 640px)', aspectRatio:'9 / 16'});
+      cap = 'Reel ' + a + ' · 8 s' + (d.sound ? ' · with sound' : ' · no sound yet');
+      stage = html`<${React.Fragment}>
+        <div className="vreel" style=${size}>
+          <${Flower} k=${d.reel.item} anim=${on} drift=${on}/>
+          <button className="playbtn" aria-label=${on ? 'Pause' : 'Play'} onClick=${() => A.play(key, d.sound)}><span style=${{opacity: on ? 0 : 1}}><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><path d=${PLAY} fill="#FFFFFF"/></svg></span></button>
+        </div>
+        <div className="prog" style=${{width:'min(420px, 86vw)',height:'4px'}}><i key=${on ? 'on' : 'off'} className=${on ? 'run' : ''}></i></div>
+      <//>`;
+    }
+  }
+  return html`<div className="viewer" role="dialog" aria-modal="true" aria-label=${f.name + ' · ' + cap}>
+    <button className="btn btn-icon close" aria-label="Close" onClick=${A.closeViewer}><${Icon} n="x" s=${18}/></button>
+    ${stage}
+    <div className="cap num">${f.name} · ${cap}</div>
+  </div>`;
+}
+
+function InsertMenu({S, A, close}){
+  const ins = S.insert;
+  const w = 248, h = 330;
+  const left = Math.min(Math.max(12, ins.x - w / 2), window.innerWidth - w - 12);
+  let top = ins.y + 8; if (top + h > window.innerHeight - 12) top = Math.max(12, ins.y - h - 52);
+  return html`<${React.Fragment}>
+    <button className="clickaway" aria-label="Close" onClick=${close}></button>
+    <div className="popover" role="menu" aria-label=${'Add before ' + ins.label} style=${{left: left + 'px', top: top + 'px'}}>
+      <span className="cap" style=${{padding:'6px 10px'}}>Add before ${ins.label}</span>
+      ${ORDER.map(k => html`<button key=${k} role="menuitem" className="mitem" onClick=${() => A.insert(ins.fid, k, ins.at)}><span className="itile"><${Icon} n=${k} s=${16}/></span><span className="n">${TYPES[k].title}</span></button>`)}
+    </div>
+  <//>`;
+}
+
+function FlowMenu({S, A, close}){
+  const m = S.flowMenu; const f = S.flows.find(x => x.id === m.fid); if (!f) return null;
+  const voted = f.votes.indexOf('R') >= 0, kept = S.kept === f.id;
+  const left = Math.min(Math.max(12, m.x - 248), window.innerWidth - 260);
+  const h = 160;
+  let top = m.y + 6; if (top + h > window.innerHeight - 12) top = Math.max(12, m.t - h - 6);
+  return html`<${React.Fragment}>
+    <button className="clickaway" aria-label="Close" onClick=${close}></button>
+    <div className="popover" role="menu" aria-label=${f.name} style=${{left: left + 'px', top: top + 'px'}}>
+      <button role="menuitem" className="mitem" onClick=${() => A.vote(f.id)}><span className="itile"><${Icon} n="team" s=${16}/></span><span className="n">${voted ? 'Remove my vote' : 'Vote for this flow'}</span></button>
+      <button role="menuitem" className="mitem" onClick=${() => A.keep(f.id)}><span className="itile"><${Icon} n="star" s=${16} fill=${kept ? 'currentColor' : 'none'}/></span><span className="n">${kept ? 'Unpick' : 'Pick as team flow'}</span></button>
+      <button role="menuitem" className="mitem" onClick=${() => A.remix(f.id)}><span className="itile"><${Icon} n="remix" s=${16}/></span><span className="n">Remix</span></button>
+    </div>
+  <//>`;
+}
+
+function Settings({S, A, close, startTour, startQuick}){
+  const st = S.settings;
+  return html`<${React.Fragment}>
+    <button className="clickaway" aria-label="Close" onClick=${close}></button>
+    <div className="panel-pop" role="dialog" aria-label="Settings" style=${{top:'calc(env(safe-area-inset-top,0px) + var(--topbar-h, 61px) + 8px)', right:'max(16px, env(safe-area-inset-right,0px))'}}>
+      <h3 className="h">Settings</h3>
+      <label className="field" htmlFor="set-budget">Monthly credits
+        <select id="set-budget" value=${st.budget} onChange=${e => A.setSettings({budget: +e.target.value})}>${[[5000,'5,000 (small plan)'],[15000,'15,000 (medium plan)'],[50000,'50,000 (large plan)']].map(o => html`<option key=${o[0]} value=${o[0]}>${o[1]}</option>`)}</select></label>
+      <label className="field" htmlFor="set-cur">Currency
+        <select id="set-cur" value=${st.currency} onChange=${e => A.setSettings({currency: e.target.value})}>${['$','€','CHF'].map(c => html`<option key=${c} value=${c}>${c}</option>`)}</select></label>
+      <label className="field" htmlFor="set-rate">Price per 1,000 credits
+        <input id="set-rate" type="number" min="0.5" max="5" step="0.05" value=${st.rate} onChange=${e => { const v = parseFloat(e.target.value); if (v > 0) A.setSettings({rate: v}); }}/></label>
+      <div style=${{display:'flex',gap:'8px',flexWrap:'wrap'}}>
+        <button className="btn" onClick=${() => { close(); startQuick(); }}>3-step start</button>
+        <button className="btn" onClick=${() => { close(); startTour(); }}>Full tour</button>
+        <button className="btn btn-ghost" onClick=${() => { A.reset(); A.set({seen:[]}); close(); }}>Reset demo</button>
+      </div>
+    </div>
+  <//>`;
+}
+
+/* ---------------- coach marks ---------------- */
+function useTarget(target){
+  const [rect, setRect] = useState(null);
+  useEffect(() => {
+    const el = document.querySelector('[data-tour="' + target + '"]');
+    if (el) el.scrollIntoView({behavior:'smooth', block:'center', inline:'nearest'});
+    let raf = 0;
+    const loop = () => {
+      const e2 = document.querySelector('[data-tour="' + target + '"]');
+      if (e2){ const r = e2.getBoundingClientRect(); setRect(p => (p && Math.abs(p.top - r.top) < .5 && Math.abs(p.left - r.left) < .5 && Math.abs(p.width - r.width) < .5 && Math.abs(p.height - r.height) < .5) ? p : {top:r.top, left:r.left, width:r.width, height:r.height}); }
+      else setRect(null);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [target]);
+  return rect;
+}
+function Coach({target, step, total, title, body, children, onBack, onSkip, onNext, nextLabel, nextPrimary}){
+  const rect = useTarget(target);
+  const ref = useRef(null);
+  const pad = 8, vw = window.innerWidth, vh = window.innerHeight;
+  let style = {left:'16px', top:'80px'};
+  if (rect){
+    const cw = Math.min(340, vw - 32), ch = ref.current ? ref.current.offsetHeight : 220;
+    let left = Math.min(Math.max(16, rect.left + rect.width / 2 - cw / 2), vw - cw - 16);
+    let top = rect.top + rect.height + pad + 12;
+    if (top + ch > vh - 16) top = rect.top - pad - 12 - ch;
+    if (top < 16 || top + ch > vh - 16){
+      top = Math.min(Math.max(16, rect.top), vh - ch - 16);
+      if (rect.right + pad + 16 + cw < vw - 16) left = rect.right + pad + 16;
+      else if (rect.left - pad - 16 - cw > 16) left = rect.left - pad - 16 - cw;
+      else top = vh - ch - 16;
+    }
+    style = {left: left + 'px', top: Math.max(16, top) + 'px'};
+  }
+  return html`<${React.Fragment}>
+    ${rect ? html`<div className="coach-mask" aria-hidden="true" style=${{top:(rect.top - pad) + 'px', left:(rect.left - pad) + 'px', width:(rect.width + pad * 2) + 'px', height:(rect.height + pad * 2) + 'px'}}></div>` : null}
+    <div className="coach" ref=${ref} role="dialog" aria-label=${title} style=${style}>
+      <span className="cap">${step} of ${total}</span>
+      <h4 className="h" style=${{fontSize:'var(--fs-body)'}}>${title}</h4>
+      <p>${body}</p>
+      ${children}
+      <div className="coach-nav">
+        <div className="dots" aria-hidden="true">${range(total).map(i => html`<i key=${i} className=${i < step ? 'on' : ''}></i>`)}</div>
+        ${onBack ? html`<button className="btn btn-ghost" onClick=${onBack}>Back</button>` : html`<button className="btn btn-ghost" onClick=${onSkip}>Skip</button>`}
+        <button className=${'btn ' + (nextPrimary ? 'btn-primary' : '')} onClick=${onNext}>${nextLabel}</button>
+      </div>
+    </div>
+  <//>`;
+}
+
+function QuickStart({S, A, $, startTour}){
+  const step = S.qs;
+  const top = S.flows[S.flows.length - 1];
+  const mood = top && top.blocks.find(b => b.type === 'mood');
+  const img = top && top.blocks.find(b => b.type === 'stills');
+  const picks = mood ? mood.picks.length : 0;
+  const imgDone = !!(img && img.ran && !img.busy);
+  const end = () => A.set({qs:null});
+  useEffect(() => { if (step === 1 && imgDone){ const t = setTimeout(() => A.set({qs:2}), 700); return () => clearTimeout(t); } }, [step, imgDone]);
+  useEffect(() => { const k = e => { if (e.key === 'Escape' && !document.querySelector('.viewer, .backdrop, .popover, .panel-pop')) end(); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); }, []);
+  if (step === 0) return html`<${Coach} target="top-mood-tiles" step=${1} total=${3} title="Look closely, ♥ what you like" body=${picks ? picks + ' liked. Like more, or go on.' : 'Tap a flower to see it big, then tap ♥. Your ♥ decide what comes next.'}
+      onSkip=${end} onNext=${() => { if (!picks && mood) A.pickMany(top.id, mood.id, [0, 5, 8]); A.set({qs:1}); }} nextLabel=${picks ? 'Next' : 'Pick for me'} nextPrimary=${picks > 0}/>`;
+  if (step === 1) return html`<${Coach} target=${img ? 'top-stills-run' : 'pal-stills'} step=${2} total=${3} title=${img ? 'Press Run' : 'Add an Image'} body=${img ? (img.busy ? 'Making your images…' : 'It shows the price before it spends anything.') : 'Image turns your ♥ into finished pictures.'}
+      onBack=${() => A.set({qs:0})} onNext=${() => { if (!img) A.insert(top.id, 'stills', null); else if (!img.ran && !img.busy) A.run(top.id, img.id); }} nextLabel=${img ? (img.busy ? 'Working…' : 'Run it') : 'Add it'} nextPrimary=${true}/>`;
+  return html`<${Coach} target="top-deck" step=${3} total=${3} title="Your first images are ready" body="Tap one to check it big. ♥ the ones you'd publish and they land in your campaign deck."
+      onBack=${() => A.set({qs:1})} onNext=${end} nextLabel="Start playing" nextPrimary=${true}>
+      <button className="linkbtn" style=${{alignSelf:'flex-start'}} onClick=${startTour}>See everything in the full tour</button>
+    <//>`;
+}
+
+function tourSteps(A, S){
+  const top = () => S.flows[S.flows.length - 1];
+  const topBlock = t => { const f = top(); return f && f.blocks.find(b => b.type === t); };
+  return [
+    {target:'palette', title:'Building blocks', body:'Each block does one job. Tap one to add it, or drag it onto a string.'},
+    {target:'top-flow', title:'A flow', body:'Steps run left to right. Strings show what passes on. The flow ends in a campaign deck.'},
+    {target:'top-mood-tiles', title:'Pick what you like', body:'Tap a flower to see it big and ♥ it. Your ♥ decide what the next step makes and costs.', action:{label:'Pick 3 for me', go:() => { const b = topBlock('mood'); if (b) A.pickMany(top().id, b.id, [0, 5, 8]); }}},
+    {target:'pal-stills', after:'top-stills', title:'Add the next step', body:'Image turns your ♥ into finished pictures.', action:{label:'Add Image', go:() => { if (!topBlock('stills')) A.insert(top().id, 'stills', null); }}},
+    {target:'top-stills-foot', title:'Price first', body:'3 ♥ × 2 versions × the model. Change any of them and the price updates before you spend.'},
+    {target:'top-stills-run', title:'Run', body:'The only button that spends. It always shows the price first.', action:{label:'Run it', go:() => { const b = topBlock('stills'); if (b) A.run(top().id, b.id); }}},
+    {target:'top-wire1', title:'Add steps anywhere', body:'Tap + on a string. A Prompt block there says exactly what you want.'},
+    {target:'top-deck', title:'Campaign deck', body:'What you are making, checked against the brief.'},
+    {target:'a-reel', title:'Watch it', body:'Flow A is further along. Tap its Reel to watch it with sound.'},
+    {target:'a-price', title:'Play with the price', body:'Keep the main pieces strong, save on the extras like sound.', enter:() => A.togglePrice(1, true), action:{label:'Save on sound', go:() => { const f = S.flows.find(x => x.id === 1); const b = f && f.blocks.find(x => x.type === 'sound'); if (b) A.setModel(f.id, b.id, 'sfx'); }}},
+    {target:'a-motion-run', title:'Quick check', body:'Before an expensive step, a short check catches wrong settings.', action:{label:'Show the check', go:() => { const f = S.flows.find(x => x.id === 1); const b = f && f.blocks.find(x => x.type === 'motion'); if (b){ A.setAspect(f.id, b.id, '16:9'); setTimeout(() => A.openPreflight(f.id, b.id), 80); } }}},
+    {target:'a-remix', after:'top-flow', title:'Try another direction', body:'Remix copies a flow. The new one lands on top, so the team can compare.', action:{label:'Remix Flow A', go:() => A.remix(1)}},
+    {target:'jar', title:'One budget', body:'The credit jar shows what is left for the project. Tap it for details.'},
+    {target:'palette', title:'Your turn', body:'Everything works. Reset any time in settings.', last:true}
+  ];
+}
+function Tour({S, setS, A}){
+  const step = S.tour;
+  const steps = tourSteps(A, S);
+  const s = steps[Math.min(step, steps.length - 1)];
+  const [acted, setActed] = useState(-1);
+  useEffect(() => { if (s.enter) s.enter(); }, [step]);
+  useEffect(() => { const k = e => { if (e.key === 'Escape' && !document.querySelector('.viewer, .backdrop, .popover, .panel-pop')) setS(p => Object.assign({}, p, {tour:null})); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); }, []);
+  const go = d => setS(p => Object.assign({}, p, {tour: Math.max(0, Math.min(steps.length - 1, p.tour + d))}));
+  const end = () => setS(p => Object.assign({}, p, {tour:null}));
+  const target = (acted === step && s.after) ? s.after : s.target;
+  return html`<${Coach} target=${target} step=${step + 1} total=${steps.length} title=${s.title} body=${s.body}
+    onBack=${step > 0 ? () => go(-1) : null} onSkip=${end} onNext=${s.last ? end : () => go(1)} nextLabel=${s.last ? 'Start playing' : 'Next'} nextPrimary=${true}>
+    ${s.action ? html`<button className="btn" style=${{alignSelf:'flex-start'}} onClick=${() => { s.action.go(); setActed(step); }}>${s.action.label}</button>` : null}
+  <//>`;
+}
+
+ReactDOM.createRoot(document.getElementById('app')).render(html`<${App}/>`);
+})();
+</script>
+</body>
+</html>
