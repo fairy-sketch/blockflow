@@ -48,6 +48,14 @@ button:disabled{cursor:default}
 .btn-primary{border:none;color:var(--on-accent);background:linear-gradient(180deg,var(--accent-top) 0%,var(--accent-bot) 100%);box-shadow:inset 0 .5px 1px rgba(255,255,255,.15), inset 0 -1px 1.2px .35px var(--accent-deep), 0 2px 4px -1px rgba(13,13,13,.5), 0 0 0 1px var(--accent-ring)}
 .btn-primary:hover{background:linear-gradient(180deg,var(--accent-top) 0%,var(--accent-top) 100%)}
 .btn-ghost{background:transparent;border-color:transparent}
+/* the one call to action: the next Run in the latest flow */
+.cta{min-height:54px;font-size:17px;position:relative;overflow:hidden;isolation:isolate;animation:glow 2.6s ease-in-out infinite}
+.cta::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-120%);animation:sheen 3.4s ease-in-out infinite}
+.cta:hover{transform:translateY(-1px)}
+.cta:active{transform:translateY(1px)}
+.cta .cta-price{opacity:.72;font-weight:600}
+@keyframes glow{0%,100%{box-shadow:inset 0 .5px 1px rgba(255,255,255,.15), inset 0 -1px 1.2px .35px var(--accent-deep), 0 2px 4px -1px rgba(13,13,13,.5), 0 0 0 1px var(--accent-ring), 0 0 0 0 rgba(27,27,26,.30), 0 6px 16px -6px rgba(27,27,26,.45)}50%{box-shadow:inset 0 .5px 1px rgba(255,255,255,.15), inset 0 -1px 1.2px .35px var(--accent-deep), 0 2px 4px -1px rgba(13,13,13,.5), 0 0 0 1px var(--accent-ring), 0 0 0 8px rgba(27,27,26,0), 0 12px 28px -6px rgba(27,27,26,.55)}}
+@keyframes sheen{0%,55%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
 .btn-ghost:hover{background:var(--field)}
 .btn-lg{min-height:52px;padding:0 24px;border-radius:14px}
 .btn-icon{width:var(--tap);padding:0}
@@ -1177,7 +1185,8 @@ function Block({f, b, idx, info, S, A, $, tourKey, isNext}){
   const est = !b.ran && info.est;
   const priceText = info.cost ? (est ? '≈ ' : '') + $(info.cost) : 'Free';
   const label = b.busy ? 'Working…' : (locked ? info.lockText : (b.type === 'prompt' ? (b.ran ? 'Send again' : 'Send prompt') : (b.ran ? 'Run again' : 'Run')));
-  const cls = 'btn btn-wide ' + (isNext ? 'btn-primary' : (b.ran ? 'btn-ghost' : ''));
+  const cta = isNext && !locked && !b.busy;
+  const cls = 'btn btn-wide ' + (cta ? 'btn-primary cta' : (b.ran ? 'btn-ghost' : ''));
 
   return html`<article className=${'block' + (b.busy ? ' busy' : '')} aria-label=${t.title} data-tour=${tk}>
     <div className="bhead">
@@ -1195,8 +1204,10 @@ function Block({f, b, idx, info, S, A, $, tourKey, isNext}){
     ${b.busy ? html`<div className="busyline" role="status"><i></i>${b.type === 'prompt' ? 'Sending…' : 'Making ' + info.count + ' ' + t.unit + '…'}</div>` : (note ? html`<span className="cap" style=${{color:'var(--ink)',fontWeight:600}}>${note}</span>` : null)}
     <div className="foot" data-tour=${tk ? tk + '-foot' : null}>
       <button className="model" aria-label=${'Model: ' + m.name + '. Change'} onClick=${() => A.openPicker(f.id, b.id)}><b>${m.name}</b><span className="num">${m.cr ? $(m.cr) + ' each' : 'free'}</span><span className="arrow"><${Icon} n="chev" s=${14}/></span></button>
-      <div className="price"><span className="cap">${b.ran ? 'Again' : (est ? 'About' : 'Price')}</span><b className="num">${priceText}</b></div>
-      <button className=${cls} disabled=${locked || b.busy} onClick=${() => A.run(f.id, b.id)} data-tour=${tk ? tk + '-run' : null}>${label}</button>
+      ${cta ? null : html`<div className="price"><span className="cap">${b.ran ? 'Again' : (est ? 'About' : 'Price')}</span><b className="num">${priceText}</b></div>`}
+      <button className=${cls} disabled=${locked || b.busy} onClick=${() => A.run(f.id, b.id)} data-tour=${tk ? tk + '-run' : null}>
+        ${cta ? html`<${React.Fragment}><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d=${PLAY} fill="currentColor"/></svg>${label}<span className="cta-price num">· ${priceText}</span><//>` : label}
+      </button>
     </div>
   </article>`;
 }
