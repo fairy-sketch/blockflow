@@ -363,6 +363,457 @@ textarea.prompt:focus{outline:none;border-color:var(--ink-3);box-shadow:0 0 0 3p
 </style>
 </head>
 <body>
+<title>Blockflow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700&display=swap">
+<style>
+/* Layout: a quiet design-tool canvas. White panels hold the work, colour lives only in the flowers.
+   One accent (ink) for the primary action and for progress. Type: one display (hero only), one heading, one body, one caption. */
+:root{
+  --canvas:#EDEDEB; --canvas-glass:rgba(237,237,235,0.9);
+  --panel:#FFFFFF; --field:#F4F4F2; --field-2:#E9E9E6;
+  --line:#E2E2DE; --line-2:#CDCDC8;
+  --ink:#1B1B1A; --ink-2:#55554F; --ink-3:#65655F;
+  --accent-top:#323232; --accent-bot:#222222; --accent-ring:#333333; --accent-deep:#121212; --on-accent:#FFFFFF;
+  --mask:rgba(27,27,26,0.42); --viewer:rgba(237,237,235,0.985);
+  --shadow-1:0 1px 2px rgba(0,0,0,0.05);
+  --shadow-2:0 1px 2px rgba(0,0,0,0.05), 0 16px 40px rgba(0,0,0,0.10);
+  --font-ui:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display:"Inter Tight", "Inter", system-ui, -apple-system, sans-serif;
+  --fs-display:clamp(40px, 6vw, 64px); --fs-h:26px; --fs-body:16px; --fs-cap:13px;
+  --r:16px; --r-ctl:12px; --tap:44px;
+}
+:root{color-scheme:light}
+*{box-sizing:border-box}
+body{background:var(--canvas);color:var(--ink);font:var(--fs-body)/1.5 var(--font-ui);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--canvas)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.wrap{padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+.num{font-variant-numeric:tabular-nums}
+.cap{font-size:var(--fs-cap);color:var(--ink-2);line-height:1.4}
+.h{font-size:var(--fs-h);font-weight:700;letter-spacing:-0.02em;line-height:1.2;margin:0}
+.eyebrow{font-size:var(--fs-cap);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+
+/* buttons: primary = the one accent, secondary = quiet panel, ghost = text */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:var(--tap);padding:0 18px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--panel);font-weight:600;font-size:var(--fs-body);white-space:nowrap;color:var(--ink);text-decoration:none;transition:transform .08s ease, background .15s ease}
+.btn:hover{background:var(--field)}
+.btn:active{transform:translateY(1px)}
+.btn-primary{border:none;color:var(--on-accent);background:linear-gradient(180deg,var(--accent-top) 0%,var(--accent-bot) 100%);box-shadow:inset 0 .5px 1px rgba(255,255,255,.15), inset 0 -1px 1.2px .35px var(--accent-deep), 0 2px 4px -1px rgba(13,13,13,.5), 0 0 0 1px var(--accent-ring)}
+.btn-primary:hover{background:linear-gradient(180deg,var(--accent-top) 0%,var(--accent-top) 100%)}
+.btn-ghost{background:transparent;border-color:transparent}
+/* the one call to action: the next Run in the latest flow */
+.cta{min-height:54px;font-size:17px;position:relative;overflow:hidden;isolation:isolate;animation:glow 2.6s ease-in-out infinite}
+.cta::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-120%);animation:sheen 3.4s ease-in-out infinite}
+.cta:hover{transform:translateY(-1px)}
+.cta:active{transform:translateY(1px)}
+.cta .cta-price{opacity:.72;font-weight:600}
+@keyframes glow{0%,100%{box-shadow:inset 0 .5px 1px rgba(255,255,255,.15), inset 0 -1px 1.2px .35px var(--accent-deep), 0 2px 4px -1px rgba(13,13,13,.5), 0 0 0 1px var(--accent-ring), 0 0 0 0 rgba(27,27,26,.30), 0 6px 16px -6px rgba(27,27,26,.45)}50%{box-shadow:inset 0 .5px 1px rgba(255,255,255,.15), inset 0 -1px 1.2px .35px var(--accent-deep), 0 2px 4px -1px rgba(13,13,13,.5), 0 0 0 1px var(--accent-ring), 0 0 0 8px rgba(27,27,26,0), 0 12px 28px -6px rgba(27,27,26,.55)}}
+@keyframes sheen{0%,55%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
+.btn-ghost:hover{background:var(--field)}
+.btn-lg{min-height:52px;padding:0 24px;border-radius:14px}
+.btn-icon{width:var(--tap);padding:0}
+.btn-wide{width:100%}
+.btn-quiet{background:var(--field);border-color:transparent;color:var(--ink-2)}
+.btn:disabled{opacity:1;background:var(--field);color:var(--ink-3);border:1px dashed var(--line-2);box-shadow:none;transform:none}
+.linkbtn{background:none;border:none;padding:0 4px;min-height:var(--tap);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.linkbtn:hover{color:var(--ink)}
+
+/* top bar: brand, two links, settings. No numbers here. */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--canvas-glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.topbar-in{display:flex;align-items:center;gap:8px 16px;min-height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-0.02em;color:var(--ink);text-decoration:none;min-height:var(--tap)}
+.mark{width:28px;height:28px;border-radius:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;padding:6px;background:linear-gradient(180deg,#323232,#222222);box-shadow:0 0 0 1px #333}
+.mark span{background:#FFFFFF;border-radius:2px}.mark span:nth-child(4){opacity:.35}
+.nav{display:flex;gap:2px}
+.nav a{display:inline-flex;align-items:center;min-height:var(--tap);padding:0 12px;border-radius:10px;color:var(--ink-2);text-decoration:none;font-weight:500}
+.nav a:hover{background:var(--field);color:var(--ink)}
+.spacer{flex:1}
+
+/* landing */
+.story{max-width:1080px;margin:0 auto;padding-block:64px 32px;display:flex;flex-direction:column;gap:88px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.hero h1{font-family:var(--font-display);font-size:var(--fs-display);line-height:1.02;letter-spacing:-0.035em;margin:12px 0 16px;font-weight:700;text-wrap:balance}
+.hero .lead{font-size:19px;line-height:1.5;color:var(--ink-2);margin:0 0 28px;max-width:40ch}
+.ctas{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.hero-art{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow-2);display:flex;flex-direction:column;gap:14px}
+.mini-row{display:flex;align-items:center;gap:6px}
+.mini-row.ghost{opacity:.4}
+.mini{flex:1;min-width:0;background:var(--field);border-radius:10px;padding:6px}
+.mini .pic{width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden}
+.mini-wire{width:10px;height:2px;background:var(--ink);border-radius:2px;flex:none}
+.mini.deck{flex:1.3;background:var(--panel);border:1px solid var(--line-2)}
+.mini.deck .pic{aspect-ratio:4/5}
+.axis{display:flex;justify-content:space-between;gap:8px}
+.sec{display:flex;flex-direction:column;gap:20px}
+.sec h2{font-family:var(--font-display);font-size:var(--fs-h);letter-spacing:-0.025em;line-height:1.1;margin:0;text-wrap:balance}
+.vs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel)}
+.vs>div{padding:16px 20px;border-top:1px solid var(--line)}
+.vs>div:nth-child(odd){color:var(--ink-2);border-right:1px solid var(--line)}
+.vs>div:nth-child(even){font-weight:600}
+.vs>.th{border-top:none;background:var(--field);font-size:var(--fs-cap);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)!important}
+.quote{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:32px}
+.quote blockquote{margin:0;font-family:var(--font-display);font-size:26px;line-height:1.3;letter-spacing:-0.015em;font-weight:600;text-wrap:balance}
+.quote p{margin:0;color:var(--ink-2)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h3{margin:0;font-size:var(--fs-body);font-weight:700}
+.card p{margin:0;color:var(--ink-2)}
+.ic{width:36px;height:36px;border-radius:10px;background:var(--field);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+.chain{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;background:var(--field);font-size:var(--fs-cap);font-weight:600;white-space:nowrap}
+.chip.ink{background:var(--ink);color:var(--panel)}
+.stackviz{display:flex;flex-direction:column;gap:6px}
+.stackviz div{min-height:36px;border-radius:10px;background:var(--field);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:var(--fs-cap);font-weight:600}
+.stackviz div:first-child{background:var(--panel);border:1px solid var(--line-2)}
+.stackviz div:nth-child(3){opacity:.55}
+.band{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px}
+
+/* playground */
+.play{padding-block:28px 96px;display:flex;flex-direction:column;gap:16px;scroll-margin-top:60px}
+.play-head{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;justify-content:space-between}
+.bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--topbar-h, 61px));z-index:20;display:flex;align-items:center;gap:8px;background:var(--canvas-glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding-block:10px;border-bottom:1px solid var(--line);margin-inline:calc(-1 * max(16px, env(safe-area-inset-left,0px)));padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+.blocks-bar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0;padding:2px}
+.blocks-bar::-webkit-scrollbar{display:none}
+.pchip{flex:none;display:flex;align-items:center;gap:8px;min-height:var(--tap);padding:0 14px 0 6px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--panel);font-weight:600;cursor:grab;user-select:none;-webkit-user-select:none}
+.pchip:hover{border-color:var(--line-2)}
+.itile{width:32px;height:32px;border-radius:9px;background:var(--field);display:flex;align-items:center;justify-content:center;flex:none;color:var(--ink)}
+.jar{flex:none;display:flex;align-items:center;gap:10px;min-height:var(--tap);padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--panel)}
+.jar .jbar{width:96px;height:6px;border-radius:999px;background:var(--field-2);overflow:hidden;display:flex}
+.jar .fill{height:100%;background:var(--ink);transition:width .35s ease}
+.jar .plan{height:100%;background:repeating-linear-gradient(135deg,var(--ink) 0 2px,transparent 2px 5px);opacity:.45;transition:width .35s ease}
+.jar b{font-weight:600}
+.delta{font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);animation:rise .25s ease;white-space:nowrap}
+.flows{display:flex;flex-direction:column;gap:20px}
+.flow{border-radius:24px;border:1px solid var(--line);background:color-mix(in srgb, var(--panel) 40%, transparent);padding:20px;display:flex;flex-direction:column;gap:14px;animation:slide .45s cubic-bezier(.2,.8,.2,1) both}
+.flow.top{background:color-mix(in srgb, var(--panel) 65%, transparent)}
+.flow.kept{border-color:var(--ink)}
+.flow-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;min-height:var(--tap)}
+.flow-tools{display:flex;gap:6px;margin-left:auto;align-items:center}
+.voters{display:flex}
+.av{width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid var(--canvas)}
+.av+.av{margin-left:-6px}
+.tipline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-ctl);padding:4px 4px 4px 14px;animation:rise .25s ease}
+.tipline span{flex:1;min-width:200px}
+.row-scroll{overflow-x:auto;padding:4px 2px 12px}
+.row{display:flex;align-items:flex-start;width:max-content}
+
+/* block */
+.block{width:280px;flex:none;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-1);display:flex;flex-direction:column;gap:14px;padding:16px;animation:snap .35s ease both}
+.block.busy{border-color:var(--ink)}
+.bhead{display:flex;align-items:center;gap:10px}
+.bhead .t{font-weight:700;line-height:1.2}
+.bhead .tt{flex:1;min-width:0;display:flex;flex-direction:column}
+.bhead .tt .cap{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xbtn{width:var(--tap);height:var(--tap);margin:-10px -10px -10px 0;border:none;background:transparent;color:var(--ink-3);display:flex;align-items:center;justify-content:center;border-radius:10px;flex:none;opacity:.6}
+.xbtn:hover{opacity:1;background:var(--field);color:var(--ink)}
+.model{display:flex;align-items:center;gap:6px;min-height:var(--tap);padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--field);width:100%;text-align:left;font-size:var(--fs-cap)}
+.model:hover{border-color:var(--line-2)}
+.model b{font-weight:600;color:var(--ink);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.model span{color:var(--ink-2)}
+.ctl-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--field)}
+.stepper button{width:var(--tap);height:var(--tap);border:none;background:transparent;font-size:20px;line-height:1;border-radius:var(--r-ctl)}
+.stepper button:hover{background:var(--field-2)}
+.stepper .v{min-width:24px;text-align:center;font-weight:600}
+.seg{display:flex;background:var(--field-2);border-radius:var(--r-ctl);padding:3px;gap:3px}
+.seg button{flex:1;white-space:nowrap;min-height:38px;border:none;border-radius:9px;background:transparent;font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);padding:0 10px}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.tiles{display:grid;grid-template-columns:repeat(5,44px);gap:5px}
+.tile{position:relative;width:44px;height:44px;padding:0;border:none;border-radius:8px;overflow:hidden;background:transparent}
+.tile.tall{height:55px}
+.tile.ghost{border:1.5px dashed var(--line-2)}
+.tile.ghost.busy,.ghost.busy{animation:shimmer .9s ease infinite}
+.tile.in{animation:pop .35s ease both}
+.tile.liked{outline:2.5px solid var(--ink);outline-offset:2px}
+.zoomable{cursor:zoom-in}
+.zoomable::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .15s ease}
+.zoomable:hover::after{background:rgba(0,0,0,.08)}
+.tile svg,svg.art{display:block;width:100%;height:100%}
+.heart{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:999px;background:#FFFFFF;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.heart svg{width:9px;height:9px}
+.refs{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ref{width:32px;height:32px;border-radius:7px;overflow:hidden;box-shadow:0 0 0 1.5px var(--line-2);flex:none}
+.ref img{width:100%;height:100%;object-fit:cover;display:block}
+.upload{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:var(--tap);padding:0 12px;border-radius:var(--r-ctl);border:1.5px dashed var(--line-2);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);cursor:pointer}
+.upload:hover{border-color:var(--ink-3);color:var(--ink)}
+.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.srow{display:flex;align-items:center;gap:6px}
+.src{width:24px;height:24px;border-radius:6px;overflow:hidden;flex:none;opacity:.8}
+.arrow{color:var(--ink-3);flex:none;display:flex}
+.pair{display:flex;align-items:center;gap:8px}
+.pair .lo{width:24px;height:30px;border-radius:5px;overflow:hidden;filter:blur(1px) saturate(.8);flex:none}
+.pair .hi{position:relative;width:44px;height:55px;border-radius:8px;overflow:hidden;flex:none}
+.tag4{position:absolute;left:3px;bottom:3px;font-size:10px;font-weight:700;padding:1px 4px;border-radius:4px;background:#FFFFFF;color:#1B1B1A}
+.ghostbox{border:1.5px dashed var(--line-2);border-radius:6px}
+.stack{display:flex;flex-direction:column;gap:6px}
+.screen{position:relative;border-radius:12px;overflow:hidden;background:var(--field);display:flex;align-items:center;justify-content:center;margin:0 auto;max-width:100%}
+.screen svg.art,.vreel svg.art,.reel svg.art{position:absolute;inset:0}
+.playbtn{position:absolute;inset:0;border:none;background:transparent;display:flex;align-items:center;justify-content:center;padding:0}
+.playbtn span{width:44px;height:44px;border-radius:999px;background:rgba(20,20,20,.55);display:flex;align-items:center;justify-content:center;transition:opacity .2s ease}
+.prog{width:100%;height:3px;border-radius:999px;background:var(--field-2);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--ink)}
+.prog i.run{animation:prog 8s linear forwards}
+.track{display:flex;align-items:center;gap:12px;background:var(--field);border-radius:var(--r-ctl);padding:8px}
+.track .pb{width:var(--tap);height:var(--tap);border-radius:999px;flex:none;padding:0}
+.wave{flex:1;display:flex;align-items:center;gap:2px;height:36px}
+.wave span{flex:1;border-radius:3px;background:var(--line-2);transform-origin:center}
+.wave.live span{background:var(--ink-3)}
+.wave.on span{animation:bar .8s ease infinite}
+.wave.on span.lit{background:var(--ink)}
+textarea.prompt{width:100%;resize:vertical;min-height:84px;padding:12px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--field);font-size:var(--fs-body);line-height:1.45}
+textarea.prompt:focus{outline:none;border-color:var(--ink-3);box-shadow:0 0 0 3px var(--field-2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{min-height:var(--tap);padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2)}
+.chips button:hover{color:var(--ink);border-color:var(--line-2)}
+.sent{background:var(--field);border-radius:var(--r-ctl);padding:12px;font-size:var(--fs-cap);line-height:1.45;color:var(--ink-2)}
+.sent b{color:var(--ink);font-weight:600}
+.pin{display:flex;align-items:center;gap:6px;font-size:var(--fs-cap);color:var(--ink-2);min-width:0}
+.pin span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.busyline{display:flex;align-items:center;gap:8px;font-size:var(--fs-cap);font-weight:600;animation:shimmer .9s ease infinite}
+.busyline i{width:8px;height:8px;border-radius:999px;background:var(--ink)}
+.foot{display:flex;flex-direction:column;gap:10px;margin-top:2px;border-top:1px solid var(--line);padding-top:14px}
+.price{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.price b{font-weight:700}
+
+/* strings */
+.wire{flex:none;width:68px;height:200px;margin:0 -4px;position:relative;z-index:1;display:flex;align-items:center;justify-content:center}
+.wire svg{overflow:visible}
+.wl{position:absolute;top:calc(50% - 40px);left:50%;transform:translateX(-50%);font-size:var(--fs-cap);font-weight:600;background:var(--panel);border:1px solid var(--line);padding:1px 8px;border-radius:999px;white-space:nowrap}
+.plus{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:var(--tap);height:var(--tap);border:none;background:transparent;padding:0;display:flex;align-items:center;justify-content:center}
+.plus span{width:26px;height:26px;border-radius:999px;background:var(--panel);border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--ink-2);transition:all .15s ease}
+.plus:hover span,.wire.hot .plus span,.wire.drop .plus span{width:32px;height:32px;background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.flowpath{animation:flow 1s linear infinite}
+.empty{width:300px;flex:none;min-height:220px;border:2px dashed var(--line-2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px;background:color-mix(in srgb, var(--panel) 50%, transparent)}
+.empty.drop{border-color:var(--ink);background:var(--field)}
+
+/* deck */
+.deck{width:380px;flex:none;background:var(--panel);border:1px solid var(--line-2);border-radius:20px;box-shadow:var(--shadow-2);padding:18px;display:flex;flex-direction:column;gap:16px}
+.deck.drop{outline:2px dashed var(--ink);outline-offset:4px}
+.deck-head{display:flex;gap:10px;align-items:center}
+.media{display:flex;gap:12px;align-items:flex-start}
+.fgrid{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.final{position:relative;display:block;width:100%;aspect-ratio:4/5;padding:0;border:none;border-radius:8px;overflow:hidden;background:transparent;cursor:zoom-in}
+.final.empty-slot{border:1.5px dashed var(--line-2);cursor:default}
+.reelcol{width:92px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.reel{position:relative;border-radius:10px;overflow:hidden;border:none;padding:0;background:var(--field);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.reel.none{border:1.5px dashed var(--line-2);background:transparent;cursor:default}
+.ticks{display:flex;flex-wrap:wrap;gap:6px}
+.tick{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:999px;background:var(--field);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2)}
+.tick i{width:16px;height:16px;border-radius:999px;border:1.5px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px}
+.tick.ok{color:var(--ink)}
+.tick.ok i{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.disclose{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:var(--tap);padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--field);font-weight:600;text-align:left}
+.disclose svg{transition:transform .2s ease}
+.disclose[aria-expanded="true"] svg{transform:rotate(180deg)}
+.pricebox{display:flex;flex-direction:column;gap:12px;animation:rise .2s ease}
+.trade{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:4px 8px}
+.trade .n{font-weight:600;display:flex;flex-direction:column;min-width:0}
+.trade .n .cap{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trade .step{display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--field)}
+.trade .step button{width:var(--tap);height:40px;border:none;background:transparent;font-size:18px;border-radius:var(--r-ctl)}
+.trade .step button:disabled{opacity:.3}
+.trade .c{min-width:56px;text-align:right;font-weight:600}
+.share{grid-column:1 / -1;height:3px;border-radius:999px;background:var(--field-2);overflow:hidden}
+.share i{display:block;height:100%;background:var(--ink);transition:width .35s ease}
+.role{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.tip{display:flex;align-items:center;gap:10px;background:var(--field);border-radius:var(--r-ctl);padding:10px 12px;font-size:var(--fs-cap);line-height:1.4}
+
+
+/* case study */
+.nav a[aria-current="location"]{color:var(--ink);background:var(--field)}
+.nav{scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{white-space:nowrap}
+.cs{max-width:1080px;margin:0 auto;padding-block:48px 24px;display:flex;flex-direction:column;gap:88px}
+.cs-end{padding-block:24px 48px}
+.intro{display:flex;flex-direction:column;gap:28px}
+.prose{max-width:68ch}
+.prose p{margin:0}
+.sec{display:flex;flex-direction:column;gap:20px;scroll-margin-top:calc(var(--topbar-h, 61px) + 16px)}
+#overview,#demo,.moment{scroll-margin-top:calc(var(--topbar-h, 61px) + 16px)}
+.sec .prose{display:flex;flex-direction:column;gap:16px}
+.sec.prose{gap:16px}
+.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.meta>div{padding:16px 18px;border-left:1px solid var(--line)}
+.meta>div:first-child{border-left:none}
+.meta dt{font-size:var(--fs-cap);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);margin-bottom:4px}
+.meta dd{margin:0}
+.disclaimer{margin:-12px 0 0}
+.pull{margin:4px 0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.pull blockquote{margin:0;font-style:italic}
+.persona{background:var(--panel);border:1px solid var(--line-2);border-radius:20px;padding:22px 24px;display:flex;flex-direction:column;gap:16px;box-shadow:var(--shadow-1)}
+.persona p{margin:0}
+.job{display:flex;flex-direction:column;gap:6px;background:var(--field);border-radius:12px;padding:14px 16px}
+.job .cap{font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.tablecard{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.legend{display:flex;gap:16px;flex-wrap:wrap}
+.legend>span{display:inline-flex;align-items:center;gap:6px}
+.tscroll{overflow-x:auto;min-width:0;border-radius:10px}
+.tscroll:focus-visible{outline:2px solid var(--ink)}
+table{border-collapse:collapse}
+.cmp{width:100%;min-width:1040px;font-size:var(--fs-cap)}
+.cmp th,.cmp td{text-align:left;vertical-align:top;padding:10px 12px;border-top:1px solid var(--line)}
+.cmp thead th{border-top:none;font-weight:600;color:var(--ink-2);background:var(--field);position:sticky;top:0}
+.cmp tbody th{font-size:var(--fs-body);font-weight:600;white-space:nowrap;position:sticky;left:0;background:var(--panel)}
+.cmp tr.mine td,.cmp tr.mine th{background:var(--field)}
+.cmp tr.mine th{box-shadow:inset 3px 0 0 var(--ink)}
+.mk{display:inline-flex;width:16px;justify-content:center;margin-right:6px;font-weight:700}
+.mk.yes{color:var(--ink)}
+.mk.part{color:var(--ink-2)}
+.mk.no{color:var(--ink-3)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.ph{display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;border:1.5px dashed var(--line-2);border-radius:var(--r);background:color-mix(in srgb, var(--panel) 45%, transparent);color:var(--ink-2);font-size:var(--fs-cap);font-weight:600;letter-spacing:.02em;width:100%;max-width:100%}
+.todo{display:inline-block;border:1.5px dashed var(--line-2);border-radius:6px;padding:1px 8px;color:var(--ink-2);font-size:var(--fs-cap)}
+.pains{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:28px;max-width:820px}
+.pain{display:grid;grid-template-columns:44px minmax(0,1fr);gap:16px}
+.pnum{width:36px;height:36px;border-radius:999px;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-weight:700}
+.pbody{display:flex;flex-direction:column;gap:12px;min-width:0}
+.pbody h3,.dec h3,.mtext h3,.sumh{margin:0;font-size:var(--fs-body);font-weight:700}
+.pbody p{margin:0;max-width:68ch}
+.qcard{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;max-width:68ch}
+.qcard blockquote{margin:0;overflow-wrap:anywhere}
+.qcard figcaption{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
+.qlink{display:inline-flex;align-items:center;gap:4px;color:var(--ink);font-weight:600;min-height:32px}
+.callout{background:var(--field);border-radius:12px;padding:14px 16px;max-width:68ch;display:flex;flex-direction:column;gap:8px}
+.card-t{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.ipf{width:100%;min-width:680px}
+.ipf th,.ipf td{text-align:left;vertical-align:top;padding:14px 16px;border-top:1px solid var(--line)}
+.ipf thead th{border-top:none;background:var(--field);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);letter-spacing:.05em;text-transform:uppercase}
+.ipf tbody th{font-weight:700;white-space:nowrap}
+.jump{display:inline-flex;align-items:center;min-height:32px;font-size:var(--fs-cap);font-weight:600;color:var(--ink);white-space:nowrap}
+.decs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.dec{gap:12px}
+.moments{display:flex;flex-direction:column;gap:40px}
+.moment{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:32px;align-items:center}
+.moment.flip{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.moment.flip .mtext{order:2}
+.mtext{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.mtext p{margin:0}
+.list,.learned{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:12px}
+.site-foot{border-top:1px solid var(--line);padding-top:24px;display:flex;flex-direction:column;gap:12px;max-width:68ch}
+.site-foot p{margin:0}
+.sources summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:600}
+.sources ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px}
+.sources a{color:var(--ink)}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.phlink{display:inline-flex;align-items:center;min-height:44px;color:var(--ink);font-weight:600;text-decoration:underline dashed;text-underline-offset:4px}
+.flashring{position:fixed;z-index:45;border-radius:18px;border:2px solid var(--ink);box-shadow:0 0 0 6px rgba(27,27,26,.12);pointer-events:none;animation:flashfade 2.2s ease forwards}
+@keyframes flashfade{0%{opacity:0}12%{opacity:1}75%{opacity:1}100%{opacity:0}}
+a{color:var(--ink)}
+
+/* overlays */
+.backdrop{position:fixed;inset:0;z-index:60;background:var(--mask);display:flex;align-items:flex-start;justify-content:center;padding:max(72px, env(safe-area-inset-top,0px)) 16px 16px;overflow-y:auto;animation:fade .15s ease}
+.sheet{width:100%;max-width:520px;background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-2);overflow:hidden;animation:rise .2s ease}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 20px;border-bottom:1px solid var(--line)}
+.sheet-body{padding:8px;display:flex;flex-direction:column;gap:2px}
+.mrow{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 12px;border-radius:12px;border:none;background:transparent;text-align:left;width:100%}
+.mrow:hover,.mrow[aria-pressed="true"]{background:var(--field)}
+.rec{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--ink);color:var(--panel);margin-left:6px}
+.qdots{display:inline-flex;gap:3px;vertical-align:middle}
+.qdots i{width:6px;height:6px;border-radius:999px;background:var(--line-2)}
+.qdots i.on{background:var(--ink)}
+.pf{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pf li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--field)}
+.pf li.need{background:var(--panel);border:1.5px solid var(--ink)}
+.popover{position:fixed;z-index:65;width:248px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-2);padding:6px;display:flex;flex-direction:column;gap:2px;animation:rise .15s ease}
+.mitem{display:flex;align-items:center;gap:10px;min-height:var(--tap);padding:0 10px 0 6px;border:none;border-radius:10px;background:transparent;text-align:left;width:100%}
+.mitem:hover{background:var(--field)}
+.mitem .n{flex:1;font-weight:600}
+.clickaway{position:fixed;inset:0;z-index:64;background:transparent;border:none}
+.panel-pop{position:fixed;z-index:65;width:320px;max-width:calc(100vw - 32px);background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-2);padding:16px;display:flex;flex-direction:column;gap:14px;animation:rise .15s ease}
+.kv{display:flex;justify-content:space-between;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:var(--fs-cap);font-weight:600;color:var(--ink-2)}
+.field select,.field input{min-height:var(--tap);border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--field);padding:0 12px;color:var(--ink);font-size:var(--fs-body);font-weight:400}
+.viewer{position:fixed;inset:0;z-index:70;background:var(--viewer);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:max(72px, env(safe-area-inset-top,0px)) 16px max(24px, env(safe-area-inset-bottom,0px));animation:fade .15s ease}
+.viewer .close{position:absolute;top:max(16px, env(safe-area-inset-top,0px));right:max(16px, env(safe-area-inset-right,0px))}
+.vstage{display:flex;align-items:center;gap:16px;max-width:100%}
+.vframe{position:relative;height:min(64vh,620px);aspect-ratio:4/5;max-width:calc(100vw - 140px);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-2);background:var(--field);animation:pop .25s ease both;cursor:zoom-in}
+.vframe.sq{aspect-ratio:1/1}
+.vframe.zoomed{cursor:zoom-out}
+.vframe .zin{position:absolute;inset:0;transition:transform .25s ease}
+.vframe img{width:100%;height:100%;object-fit:contain;display:block}
+.vframe .soft{filter:blur(3px) saturate(.85)}
+.vbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.likebtn{min-width:132px}
+.strip{display:flex;gap:6px;overflow-x:auto;max-width:min(720px, calc(100vw - 32px));padding:4px;scrollbar-width:thin}
+.strip button{position:relative;width:44px;height:44px;flex:none;padding:0;border:none;border-radius:8px;overflow:hidden;opacity:.6;background:var(--field)}
+.strip button[aria-current="true"]{opacity:1;outline:2.5px solid var(--ink);outline-offset:2px}
+.strip button:hover{opacity:1}
+.strip img{width:100%;height:100%;object-fit:cover;display:block}
+.strip .heart{width:13px;height:13px;top:2px;right:2px}
+.vimg{height:min(70vh,640px);aspect-ratio:4/5;max-width:calc(100vw - 140px);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-2);animation:pop .25s ease both}
+.vreel{position:relative;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-2);animation:pop .25s ease both;max-width:calc(100vw - 32px)}
+.vreel .playbtn span{width:72px;height:72px}
+.toast{position:fixed;left:50%;bottom:max(20px, env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:999px;font-size:var(--fs-cap);font-weight:600;box-shadow:var(--shadow-2);max-width:calc(100vw - 32px);animation:rise .2s ease}
+.toast{display:flex;align-items:center;gap:12px}
+.toast-act{min-height:32px;margin:-6px -8px -6px 0;padding:0 12px;border:none;border-radius:999px;background:rgba(255,255,255,.16);color:inherit;font-size:var(--fs-cap);font-weight:700}
+.toast-act:hover{background:rgba(255,255,255,.26)}
+.toast.up{bottom:auto;top:calc(env(safe-area-inset-top,0px) + var(--topbar-h, 61px) + 76px)}
+
+/* coach card (quick start + full tour) */
+.coach-mask{position:fixed;z-index:50;border-radius:16px;box-shadow:0 0 0 9999px var(--mask);pointer-events:none;transition:all .3s cubic-bezier(.2,.8,.2,1)}
+.coach{position:fixed;z-index:55;width:340px;max-width:calc(100vw - 32px);background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-2);padding:18px;display:flex;flex-direction:column;gap:12px;transition:top .3s ease, left .3s ease}
+.coach p{margin:0;color:var(--ink-2)}
+.coach-nav{display:flex;align-items:center;gap:6px}
+.dots{display:flex;gap:5px;flex:1}
+.dots i{width:6px;height:6px;border-radius:999px;background:var(--line-2)}
+.dots i.on{background:var(--ink)}
+
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes rise{from{transform:translateY(6px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes slide{from{transform:translateY(-28px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes snap{0%{transform:scale(.92);opacity:0}70%{transform:scale(1.01);opacity:1}100%{transform:scale(1)}}
+@keyframes flow{to{stroke-dashoffset:-24}}
+@keyframes shimmer{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg) scale(1.05)}}
+@keyframes drift{0%{transform:translate(0,0);opacity:0}15%{opacity:.9}100%{transform:translate(14px,-34px);opacity:0}}
+@keyframes bar{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.1)}}
+@keyframes prog{from{width:0}to{width:100%}}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.sway{transform-origin:50% 92%;transform-box:view-box;animation:sway 1.6s ease-in-out infinite}
+.drift{animation:drift 2.4s ease-in infinite}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+@media (max-width: 900px){
+  .meta{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .meta>div:nth-child(3){border-left:none}
+  .meta>div:nth-child(n+3){border-top:1px solid var(--line)}
+  .grid3,.decs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .moment,.moment.flip{grid-template-columns:minmax(0,1fr)}
+  .moment.flip .mtext{order:0}
+  .hero,.quote,.two{grid-template-columns:minmax(0,1fr)}
+  .four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .jar .jbar{width:56px}
+}
+@media (max-width: 600px){
+  .vframe{max-width:calc(100vw - 32px);height:auto;width:calc(100vw - 32px)}
+  .vstage>.btn{display:none}
+  .four,.vs{grid-template-columns:minmax(0,1fr)}
+  .vs>div:nth-child(odd){border-right:none}
+  .vs>.th:nth-child(2){display:none}
+  .nav{order:5;flex-basis:100%;overflow-x:auto;scrollbar-width:none;margin:0 -8px}
+  .try{display:none}
+  .meta{grid-template-columns:minmax(0,1fr)!important}
+  .moment,.moment.flip{grid-template-columns:minmax(0,1fr)!important}
+  .moment.flip .ph{order:0}
+  .grid3,.decs{grid-template-columns:minmax(0,1fr)!important}
+  .pain{grid-template-columns:36px minmax(0,1fr)!important;gap:12px!important}
+  .story{padding-block:36px 16px;gap:56px}
+  .deck{width:min(380px, calc(100vw - 72px))}
+  .bar{flex-wrap:wrap}
+  .blocks-bar{order:2;flex-basis:100%}
+  .jar{margin-left:auto}
+  .coach{left:16px!important;right:16px;bottom:max(16px, env(safe-area-inset-bottom,0px));top:auto!important;width:auto}
+}
+</style>
+
 <div id="app"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
@@ -898,25 +1349,41 @@ function App(){
   const startQuick = () => { A.reset(true); setTimeout(() => { setS(p => Object.assign({}, p, {qs:0, tour:null})); }, 60); };
   const startTour = () => { A.reset(true); setTimeout(() => setS(p => Object.assign({}, p, {tour:0, qs:null, jarOpen:false, settingsOpen:false})), 60); };
   const hint = currentHint(S);
+  const keyOf = fid => fid === topId ? 'top' : (fid === 1 ? 'a' : 'f' + fid);
+  const flash = t => setS(p => Object.assign({}, p, {flash:t, flashKey:(p.flashKey || 0) + 1}));
+  function showMoment(n){
+    const f1 = S.flows.find(x => x.id === 1);
+    setS(p => Object.assign({}, p, {qs:null, tour:null, preflight:null, picker:null, viewer:null, jarOpen:false, settingsOpen:false}));
+    if (n === 1) { startQuick(); return; }
+    if (!f1) { goTo('demo'); setTimeout(() => flash('palette'), 400); return; }
+    if (n === 2) { A.togglePrice(1, true); A.preset(1, 'lean'); flash(keyOf(1) + '-price'); return; }
+    if (n === 3) {
+      const mb = f1.blocks.find(b => b.type === 'motion');
+      if (!mb) { flash(keyOf(1) + '-flow'); return; }
+      A.setAspect(1, mb.id, '16:9'); flash(keyOf(1) + '-motion');
+      timers.current.push(setTimeout(() => A.openPreflight(1, mb.id), 1100));
+      return;
+    }
+    if (n === 4) { A.remix(1); timers.current.push(setTimeout(() => flash('top-flow'), 120)); }
+  }
 
   return html`
     <header className="topbar">
       <div className="wrap topbar-in">
-        <a className="brand" href="#story" onClick=${e => { e.preventDefault(); scrollTo('story'); }}><span className="mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>Blockflow</a>
-        <nav className="nav" aria-label="Sections">
-          <a href="#story" onClick=${e => { e.preventDefault(); scrollTo('story'); }}>Idea</a>
-          <a href="#playground" onClick=${e => { e.preventDefault(); scrollTo('playground'); }}>Try it</a>
-        </nav>
+        <a className="brand" href="#overview" onClick=${e => { e.preventDefault(); goTo('overview'); }}><span className="mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>Blockflow</a>
+        <${MiniNav}/>
         <div className="spacer"></div>
+        <a className="btn try" href="#demo" onClick=${e => { e.preventDefault(); goTo('demo'); }}>Try the demo</a>
         <button className="btn btn-ghost btn-icon" aria-label="Settings and full tour" onClick=${() => A.set({settingsOpen: !S.settingsOpen})}><${Icon} n="gear" s=${19}/></button>
       </div>
     </header>
 
-    <${Story} onStart=${startQuick} onTour=${startTour} go=${scrollTo}/>
+    <${CaseTop} onStart=${startQuick} show=${showMoment}/>
 
-    <section id="playground" className="wrap play">
+    <section id="playground" className="wrap play" aria-labelledby="demo-h">
+      <${DemoIntro} onStart=${startQuick} onTour=${startTour} reset=${() => A.reset()}/>
       <div className="play-head">
-        <h2 className="h">Spring campaign</h2>
+        <h3 id="demo-h" className="h">Spring campaign</h3>
         <span className="cap">Brief: 6 stills in 4K and one 9:16 Reel. Fresh, bright, golden hour.</span>
       </div>
 
@@ -943,6 +1410,8 @@ function App(){
       </div>
     </section>
 
+    <${CaseBottom}/>
+    ${S.flash ? html`<${FlashRing} key=${S.flash + S.flashKey} target=${S.flash} onDone=${() => A.set({flash:null})}/>` : null}
     ${S.jarOpen ? html`<${JarPop} S=${S} T=${T} $=${$} free=${free} A=${A}/>` : null}
     ${S.picker ? html`<${Picker} S=${S} A=${A} $=${$} close=${() => A.set({picker:null})}/>` : null}
     ${S.preflight ? html`<${Preflight} S=${S} A=${A} $=${$} T=${T} update=${update}/>` : null}
@@ -956,7 +1425,47 @@ function App(){
   `;
 }
 
-/* ---------------- landing ---------------- */
+/* ---------------- case study ---------------- */
+const SMOOTH = () => (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth';
+const goTo = id => { const el = document.getElementById(id); if (el) el.scrollIntoView({behavior: SMOOTH(), block:'start'}); };
+
+const Q = {
+  q10: {text:'With so many nodes and parameters to slightly tweak with each run, how do you keep track of what you’ve tried? … A word doc with params and a screenshot of the result perhaps?', who:'Reddit user', where:'Reddit, r/comfyui, “How do you keep track of your iterations?”', date:'Date not shown on page (~2024)', url:'https://www.reddit.com/r/comfyui/comments/1d16bho/how_do_you_keep_track_of_your_iterations/'},
+  q6: {text:'Burned through my whole month’s credits in 4 days…', who:'@cg_harate', where:'X', date:'29 Sep 2026', url:'https://x.com/cg_harate/status/2104787434081005639'},
+  q8: {text:'somehow burned through HALF my credits on just 2 short videos \u{1F605}', who:'@navneetdamani', where:'X', date:'25 Sep 2026', url:'https://x.com/navneetdamani/status/2103489168693223472'},
+  q2: {text:'Creating a video on Higgsfield and chose the wrong aspect ratio. 60 credits gone! 1080p. I’m so pained \u{1F611}', who:'@_Vilma_Baebi', where:'X', date:'21 Sep 2026', url:'https://x.com/_Vilma_Baebi/status/2102096369016049950'},
+  q1: {text:'I thought I would try LTX-2 Pro, but there is no way to set the aspect ratio. … there is nothing warning or notifiying us that all videos will just be 16:9 and you have no choice over it.', who:'Reddit user', where:'Reddit, r/leonardoai, “Waste of 360 tokens”', date:'~Nov 2025 (shown “1y ago”)', url:'https://www.reddit.com/r/leonardoai/comments/1otajv6/waste_of_360_tokens/'},
+  q11: {text:'most of the burned credits come from animating a frame you weren’t sold on. lock the still first and only send the keepers to kling', who:'@smoothyedit', where:'X', date:'17 Oct 2026', url:'https://x.com/smoothyedit/status/2111441126825574758'},
+  q9: {text:'The video nodes ran silently on incomplete inputs … It’s a missing safeguard.', who:'Kishore Raja Anumula', where:'LinkedIn, about Freepik Spaces (10,500 credits lost)', date:'25 Feb 2026', url:'https://www.linkedin.com/posts/kishore-raja-anumula-438b4727_freepikspace-uxdesign-productfeedback-activity-7432286266169155584-GKv5'}
+};
+const FLORA_URL = 'https://flora.ai/blog/a-new-pricing-model-for-flora-plus-nano-banana-on-us';
+const SOURCES = [
+  ['FLORA blog, “A new pricing model for FLORA”, 5 May 2026', FLORA_URL],
+  ['letz.ai', 'https://letz.ai'],
+  ['Reddit, r/comfyui, “How do you keep track of your iterations?”', Q.q10.url],
+  ['@cg_harate on X, 29 Sep 2026', Q.q6.url],
+  ['@navneetdamani on X, 25 Sep 2026', Q.q8.url],
+  ['@_Vilma_Baebi on X, 21 Sep 2026', Q.q2.url],
+  ['Reddit, r/leonardoai, “Waste of 360 tokens”', Q.q1.url],
+  ['@smoothyedit on X, 17 Oct 2026', Q.q11.url],
+  ['Kishore Raja Anumula on LinkedIn, 25 Feb 2026', Q.q9.url]
+];
+
+function ExtIcon(){ return html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>`; }
+function QuoteCard({q}){
+  return html`<figure className="qcard">
+    <blockquote>“${q.text}”</blockquote>
+    <figcaption className="cap"><span>${q.who}</span><span aria-hidden="true">·</span><span>${q.where}</span><span aria-hidden="true">·</span><span>${q.date}</span>
+      <a href=${q.url} target="_blank" rel="noopener noreferrer" className="qlink">Source<${ExtIcon}/><span className="sr"> (opens in a new tab)</span></a></figcaption>
+  </figure>`;
+}
+function Ph({id, name, ratio}){
+  const r = (ratio || '16:10').split(':');
+  return html`<div className="ph" role="img" aria-label=${'Placeholder for asset ' + id + ': ' + name + ', ' + ratio} style=${{aspectRatio: r[0] + ' / ' + r[1]}}>
+    <span>ASSET ${id} · ${name} · ${ratio}</span>
+  </div>`;
+}
+function Todo({children}){ return html`<span className="todo">[Ramon: ${children}]</span>`; }
 function MiniFlow({ghost, seed}){
   const steps = [{i:2, seed, v:0}, {i:2, seed, v:3}, {i:2, seed, v:3}, {i:2, seed, v:3}];
   return html`<div className=${'mini-row' + (ghost ? ' ghost' : '')}>
@@ -964,77 +1473,270 @@ function MiniFlow({ghost, seed}){
     <div className="mini deck"><div className="pic"><${Flower} k=${{i:2, seed, v:3}}/></div></div>
   </div>`;
 }
-function Story({onStart, onTour, go}){
-  return html`<main id="story" className="wrap" style=${{scrollMarginTop:'60px'}}>
-    <div className="story">
-      <section className="hero">
-        <div>
-          <div className="eyebrow">Concept case study</div>
-          <h1>Plan the canvas before you paint.</h1>
-          <p className="lead">Build AI campaigns step by step, and see the price before you spend.</p>
-          <div className="ctas">
-            <button className="btn btn-primary btn-lg" onClick=${onStart}>Try it in 3 steps</button>
-            <button className="linkbtn" onClick=${() => go('playground')}>Or just look around</button>
-          </div>
-        </div>
-        <div className="hero-art" aria-label="Two flows of blocks, one above the other">
-          <div className="axis cap"><span>Steps, left to right →</span><span>Result</span></div>
-          <${MiniFlow} seed=${3}/>
-          <${MiniFlow} seed=${11} ghost=${true}/>
-          <div className="cap">↓ Alternatives to compare</div>
-        </div>
-      </section>
 
-      <section className="sec">
-        <div className="eyebrow">Why</div>
-        <h2>Most AI tools are one prompt box.</h2>
-        <div className="vs">
-          <div className="th">Today</div><div className="th">Blockflow</div>
-          <div>The process lives in your head.</div><div>The process is on screen, step by step.</div>
-          <div>You see the cost after you spend it.</div><div>Each step shows its price first.</div>
-          <div>A wrong format gets paid twice.</div><div>A quick check catches it first.</div>
-          <div>The team only sees the result.</div><div>The team compares whole directions.</div>
+const CMP_COLS = ['Tool','Type','Billing','Price of one step before run','Price of whole plan before run','Checks against brief/format','Compare whole directions','Team view','Multi-model'];
+const CMP = [
+  ['FLORA','Canvas','$ budget','Yes, in-app (but de-emphasised)','Not found','Not found','By hand','Yes, real-time','Yes'],
+  ['Figma Weave','Nodes','Credits','Yes (Run button)','Not found','Not found','By hand','Team plan','Yes'],
+  ['Magnific Spaces','Nodes','Credits','Yes (Run button)','Not found','Not found','Multi-gen, by hand','Yes, co-editing','Yes'],
+  ['Krea Nodes','Nodes','Compute units','Yes','*Partly (Node Agent)','Not found','Not found','Business','Yes'],
+  ['ComfyUI','Nodes','Free local / credits','Usually (badges)','Not found','Not found','By hand','No sharing of credits','Yes'],
+  ['Midjourney','Prompt','GPU time','Approx. minutes only','No','Not found','4-up grid','Not found','No'],
+  ['Higgsfield','Prompt','Credits','Yes (button)','Not found','Not found','Not found','Not found','Yes'],
+  ['Runway','Prompt','Credits','Rates published','Not found','Not found','Not found','Shared pool','Unknown'],
+  ['Leonardo','Prompt','Tokens','Yes (button)','Not found','Not found','Not found','Teams plan','Yes'],
+  ['Blockflow (concept)','Grid of flows','Sample $','Yes','*Yes, per flow + jar','*Yes, quick check','*Yes, flows stacked down','Yes','Yes']
+];
+function mark(v){
+  const t = v.replace(/^\*/, '');
+  if (t === 'Unknown') return '';
+  if (/^(Yes|Team plan|Teams plan|Business)/.test(t)) return '✓';
+  if (/^(Not found|No\b|No sharing)/.test(t)) return '–';
+  return '~';
+}
+function CmpCell({v, i}){
+  const bold = v[0] === '*', t = v.replace(/^\*/, '');
+  if (i < 3) return i === 0 ? html`<th scope="row">${bold ? html`<b>${t}</b>` : t}</th>` : html`<td>${t}</td>`;
+  const m = mark(v);
+  return html`<td><span className=${'mk ' + (m === '✓' ? 'yes' : m === '~' ? 'part' : 'no')} aria-hidden="true">${m}</span>${bold ? html`<b>${t}</b>` : t}</td>`;
+}
+
+const PAINS = [
+  {t:'The process lives in your head.', p:'A campaign is a chain of steps, but most tools show one step at a time, so you keep the plan in notes or in your head.', q:['q10']},
+  {t:'You see the price of one click, not of the campaign.', p:'Each button is honest, but the total only shows up when it’s gone.', q:['q6','q8']},
+  {t:'A wrong format gets paid twice.', p:'The most common and most avoidable mistake: the video comes out 16:9 when the brief needs 9:16.', q:['q2','q1'], callout:true},
+  {t:'Expensive steps run on things you weren’t sold on.', p:'People already work around this by hand: cheap first, expensive only for the keepers.', q:['q11']},
+  {t:'Multi-step canvases fail silently.', p:'', q:['q9']},
+  {t:'The team only sees the result.', p:'Directions get compared as finished images, not as the steps and costs behind them. If the whole team could see the process, and not only the output, they could think along and get more involved instead of just reacting to a result.', q:[], todo:'add a quote or observation for pain 6, if you have one'}
+];
+const IPF = [
+  ['A campaign is a chain, but tools show one step','Show the process','Blocks run left to right: Moodboard → Prompt → Image → Upscale → Video → Sound → Deck', 'demo', 'Try it in the demo'],
+  ['Prices are per click, so the total is a surprise','Price first','Each flow shows its total. Run is the only button that spends, and it says how much. Credit jar: budget, spent, planned, left', 'moment-1', 'Moment 1'],
+  ['People already go cheap first, then expensive','Explore cheap, finish well','Cheap models for moodboards and drafts, the best model only for keepers. “Play with the price” presets (Visual first / Balanced / Lean)', 'moment-2', 'Moment 2'],
+  ['Mistakes are found after paying','Check before you spend','Quick check before expensive steps: “Format is 16:9. The brief needs 9:16.” One tap to switch', 'moment-3', 'Moment 3'],
+  ['Directions get judged as finished images','Compare whole directions','Flows stack downward (Flow A ★ $4.86, Flow B $2.10). Remix copies a flow into a new direction', 'moment-4', 'Moment 4']
+];
+const DECISIONS = [
+  {t:'Node graph vs. “work across, compare down.”', p:'Node canvases are powerful, but every wire is a decision, and two directions turn into spaghetti. I chose a stricter grid: steps always go left to right, and alternatives always stack downward. I lose freedom (no loops, no wiring one output into three places). I gain a layout where anyone can read a flow in seconds and compare directions row by row. For campaign work, which is mostly linear, I think the trade is worth it. I didn’t start from a node sketch: the layout came straight from the way I described my wish to my friend, a pipeline you read across and directions you compare down.', ph:['D1','Node graph vs. across/down grid, before/after sketch','16:10']},
+  {t:'One button that spends.', p:'Every other control is free to touch: models, versions, formats, presets. Only Run spends, and it always says how much (“Run · $1.58”). This is the decision I weighed hardest against FLORA’s “hide the price” approach. Hiding the price lowers the stress of each click. Showing it once, on the one button that matters, lowers the stress of the whole project.', ph:['D2','The one Run button that spends, sketch','4:3']},
+  {t:'Price the plan, not just the click.', p:'Every block shows “about $x” before it runs. The flow sums it, and the credit jar shows planned vs. left. The cost is a design material you can shape, not a bill that arrives later.'},
+  {t:'A check, not a wall.', p:'The quick check shows up only before expensive steps, gives one clear fix (“Switch to 9:16”), and always offers “Make it anyway” and “Don’t ask again”. It should feel like a friend looking over your shoulder, not a form.', ph:['D3','Quick check: blocking form vs. friendly check, before/after','16:10']},
+  {t:'Sample prices and flower placeholders.', p:'I deliberately didn’t wire real models or real prices. Real prices change monthly, and the point of the concept is the shape of the decision, not the exact number. The flowers keep it light and stop people judging image quality instead of the flow.'},
+  {t:'Guided tours in two lengths.', p:'A 3-step tour for people skimming a portfolio, and a 14-step tour for people who want every detail. Portfolio visitors skim, so the short one gets them to the point in about 20 seconds, while the long one is there for anyone who wants to see how deep it goes.'}
+];
+const MOMENTS = [
+  {t:'Moment 1. Price first.', p:'Open the Spring campaign. Every block shows its price before anything runs. Run says “Run · $1.58”. The credit jar shows the month: budget, spent, planned, left.', ph:['M1','GIF, Price first: prices before anything runs','16:10']},
+  {t:'Moment 2. Explore cheap, finish well.', p:'Generate a moodboard with a cheap model, heart the ideas you like, and send only those to the main image model. Switch the preset to Lean and watch the flow total drop (“Save $0.20”).', ph:['M2','GIF, Explore cheap: hearts and the Lean preset','16:10']},
+  {t:'Moment 3. Check before you spend.', p:'Before the video step: “Quick check before you spend $1.15. Format is 16:9. The brief needs 9:16.” One tap on “Switch to 9:16” and the mistake never costs anything.', ph:['M3','GIF, Quick check: switching to 9:16','16:10']},
+  {t:'Moment 4. Compare whole directions.', p:'Remix Flow A into Flow C. Flows stack down, each with its total, so the team compares directions, not just pictures.', ph:['M4','GIF, Remix: flows stacking down','16:10']}
+];
+
+function CaseTop({onStart, show}){
+  return html`<main id="overview" className="wrap cs">
+    <div className="intro">
+    <section className="hero">
+      <div>
+        <div className="eyebrow">Blockflow</div>
+        <h1>Plan the canvas before you paint.</h1>
+        <p className="lead">A personal project: a visual workspace I designed for myself to plan AI campaign assets step by step, and to see what the whole thing costs before I spend anything.</p>
+        <div className="ctas">
+          <button className="btn btn-primary btn-lg" onClick=${onStart}>Try it in 3 steps</button>
+          <a className="linkbtn" href="#demo" onClick=${e => { e.preventDefault(); goTo('demo'); }}>Jump to the demo</a>
         </div>
-      </section>
-
-      <section className="quote">
-        <blockquote>“If the frame is too thin or the paint too runny, you only notice when the picture is done.”</blockquote>
-        <p>Painters choose frame and paint first. In AI work, models, formats and credits are the frame and paint. Blockflow puts them on the canvas.</p>
-      </section>
-
-      <section className="sec">
-        <div className="eyebrow">How</div>
-        <h2>Work across, compare down.</h2>
-        <div className="two">
-          <div className="card">
-            <h3>Across: the steps</h3>
-            <p>Blocks connect from first idea to a finished campaign deck.</p>
-            <div className="chain">${['Moodboard','Image','Upscale','Video','Sound'].map(c => html`<span key=${c} className="chip">${c}</span>`)}<span className="chip ink">Deck</span></div>
-          </div>
-          <div className="card">
-            <h3>Down: the alternatives</h3>
-            <p>Remix a flow to try another direction. The team compares and picks one.</p>
-            <div className="stackviz" aria-hidden="true"><div><span>Flow C</span><span>$4.86</span></div><div><span>Flow B</span><span>$2.10</span></div><div><span>Flow A ★</span><span>$4.86</span></div></div>
-          </div>
-        </div>
-      </section>
-
-      <section className="sec">
-        <div className="eyebrow">What changes</div>
-        <div className="four">
-          <div className="card"><span className="ic"><${Icon} n="price"/></span><h3>Price first</h3><p>Run shows the cost before it spends.</p></div>
-          <div className="card"><span className="ic"><${Icon} n="mood"/></span><h3>Explore cheap</h3><p>Try ideas cheaply, finish the best ones well.</p></div>
-          <div className="card"><span className="ic"><${Icon} n="shield"/></span><h3>Check first</h3><p>A quick check before expensive steps.</p></div>
-          <div className="card"><span className="ic"><${Icon} n="team"/></span><h3>Team in the loop</h3><p>Everyone sees the steps, not only the result.</p></div>
-        </div>
-      </section>
-
-      <section className="band">
-        <div><h2 className="h">Try it with flowers.</h2><p className="cap" style=${{margin:'4px 0 0'}}>All images are flower placeholders. Prices are samples.</p></div>
-        <div className="ctas"><button className="btn btn-primary btn-lg" onClick=${onStart}>Try it in 3 steps</button><button className="btn btn-lg" onClick=${onTour}>Full tour</button></div>
-      </section>
+      </div>
+      <div className="hero-art" aria-label="Illustration: two flows of blocks, one above the other">
+        <div className="axis cap"><span>Steps, left to right →</span><span>Result</span></div>
+        <${MiniFlow} seed=${3}/>
+        <${MiniFlow} seed=${11} ghost=${true}/>
+        <div className="cap">↓ Alternatives to compare</div>
+      </div>
+    </section>
+    <dl className="meta">
+      <div><dt>Role</dt><dd>Solo: research, product & UX design, prototype</dd></div>
+      <div><dt>Type</dt><dd>Personal project, not a product launch</dd></div>
+      <div><dt>Timeframe</dt><dd>2 weeks, Nov 2026</dd></div>
+      <div><dt>Tools</dt><dd>Claude (research partner and prototype)</dd></div>
+    </dl>
+    <p className="disclaimer cap">Concept prototype. Images are flower placeholders and prices are samples.</p>
     </div>
+
+    <section className="sec prose" aria-labelledby="spark-h">
+      <div className="eyebrow">1</div>
+      <h2 id="spark-h" className="h">The spark</h2>
+      <p>I've burned a lot of credits. Worse, instead of focusing on the creative work, I kept checking how many tokens I was burning. When I tried to work freely, I was annoyed at how much I paid and that I had no overview of the whole process, nothing that let me adjust things first, like making the whole pipeline cheaper before I ran it. Video was the worst: so many times the format or resolution was wrong and the credits were simply gone. When I started experimenting with AI agents, I loved the tech, but after a while I was checking usage every few minutes instead of working, and eventually I stopped.</p>
+      <p>The idea itself came while I was testing <a href="https://letz.ai" target="_blank" rel="noopener noreferrer">letz.ai<span className="sr"> (opens in a new tab)</span></a>, a friend's AI platform, to give him feedback. Speaking as a creator, I wrote him what I'd wish for:</p>
+      <figure className="pull">
+        <blockquote>“Sometimes we forget that for artists, it's not only the end product that counts. The process before it matters just as much. The thickness of the stretcher frame and the quality of the paint have to be right for what I want to make. If I don't plan and just buy, I only notice when the picture is in front of me: oh no, the frame is far too thin and the paint too runny, so I have to do it all again.”</blockquote>
+        <figcaption className="cap">From my feedback to a friend, translated from Swiss German</figcaption>
+      </figure>
+      <p>That's where Blockflow comes from. I wasn't short of ideas or models. What I didn't have was a view of the whole job, and its price, before I started it. Making token use understandable lets you decide upfront and feel in control of what you invest, instead of feeling extracted.</p>
+    </section>
+
+    <section className="sec prose" aria-labelledby="who-h">
+      <div className="eyebrow">2</div>
+      <h2 id="who-h" className="h">Who it's for</h2>
+      <div className="persona">
+        <p><b>Me, and people who work like me.</b> People who make campaign assets with AI on a monthly budget: a moodboard, a few stills, an upscale, a short vertical video, some sound. It's never one prompt. It's a chain of five or six steps across several models, and each step has its own price.</p>
+        <p className="job"><span className="cap">The job</span><em>“Deliver 6 stills in 4K and one 9:16 Reel for a spring campaign, without blowing this month's budget, and show the team two directions before I commit.”</em></p>
+      </div>
+    </section>
+
+    <section id="research" className="sec" aria-labelledby="look-h">
+      <div className="prose">
+        <div className="eyebrow">3</div>
+        <h2 id="look-h" className="h">What I looked at</h2>
+        <p>I spent time in the tools I'd actually use for this kind of work, both the node canvases and the prompt boxes. For each one I asked the same five questions: does it show the cost before I run, the cost of the whole plan, whether my output matches the brief, whether I can compare directions, and whether my team sees the steps or only the result.</p>
+      </div>
+      <div className="tablecard">
+        <div className="legend cap" aria-label="Legend"><span><span className="mk yes" aria-hidden="true">✓</span>yes</span><span><span className="mk part" aria-hidden="true">~</span>partly</span><span><span className="mk no" aria-hidden="true">–</span>not found</span></div>
+        <div className="tscroll" tabIndex="0" role="region" aria-label="Comparison table, scrolls sideways">
+          <table className="cmp">
+            <caption className="sr">How the tools compare on pricing, checks, comparing directions and team view</caption>
+            <thead><tr>${CMP_COLS.map(c => html`<th key=${c} scope="col">${c}</th>`)}</tr></thead>
+            <tbody>${CMP.map(r => html`<tr key=${r[0]} className=${r[0].indexOf('Blockflow') === 0 ? 'mine' : ''}>${r.map((v, i) => html`<${CmpCell} key=${i} v=${v} i=${i}/>`)}</tr>`)}</tbody>
+          </table>
+        </div>
+        <p className="cap" style=${{margin:0}}>* Based on public docs, checked 12 Nov 2026. ‘Not found’ means not found in docs I read.</p>
+      </div>
+      <div className="prose">
+        <p><b>What surprised me.</b> I expected nobody to show prices up front. I was wrong: Higgsfield, Leonardo, Magnific Spaces and Figma Weave all put the cost on the Run or Generate button now. The gap is one level up. Every tool prices <b>the click</b>. I couldn't find one that prices <b>the plan</b> before the first step runs. Krea's Node Agent is the closest: it shows a cost before it builds a workflow. None of them checks a step against the brief before it spends.</p>
+        <p>FLORA went the other way. In May 2026 it dropped credits and took the price tag off every model card, because <a href=${FLORA_URL} target="_blank" rel="noopener noreferrer">“credits made every generation a small financial decision, and creative work doesn't survive that.”<span className="sr"> (FLORA blog, opens in a new tab)</span></a> I think they're right about the problem. Blockflow is my bet on a different answer: <b>one price for the whole plan, shown once, before you start</b>, instead of many small prices, or none.</p>
+      </div>
+      <div className="grid3">
+        <${Ph} id="C1" name="Figma Weave, Run button with price, annotated" ratio="16:10"/>
+        <${Ph} id="C2" name="Magnific Spaces, node canvas, annotated" ratio="16:10"/>
+        <${Ph} id="C3" name="FLORA canvas, annotated" ratio="16:10"/>
+        <${Ph} id="C4" name="Krea Node Agent, cost before building, annotated" ratio="16:10"/>
+        <${Ph} id="C5" name="Higgsfield, Generate button with credits, annotated" ratio="16:10"/>
+        <${Ph} id="C6" name="Leonardo, token cost on the button, annotated" ratio="16:10"/>
+      </div>
+    </section>
+
+    <section className="sec" aria-labelledby="pain-h">
+      <div className="prose"><div className="eyebrow">4</div><h2 id="pain-h" className="h">Pain points</h2></div>
+      <ol className="pains">
+        ${PAINS.map((p, i) => html`<li key=${i} className="pain">
+          <div className="pnum" aria-hidden="true">${i + 1}</div>
+          <div className="pbody">
+            <h3>${p.t}</h3>
+            ${p.p ? html`<p>${p.p}</p>` : null}
+            ${p.q.map(k => html`<${QuoteCard} key=${k} q=${Q[k]}/>`)}
+            ${p.todo ? html`<p className="cap"><${Todo}>${p.todo}<//></p>` : null}
+            ${p.callout ? html`<div className="callout"><b>Cost of the mistake.</b> At Runway's published rate (12 credits per second), a 10-second clip made twice costs 240 credits, which is 38% of a Standard plan's month. <span className="cap"><${Todo}>add the link to Runway's published rate<//></span></div>` : null}
+          </div>
+        </li>`)}
+      </ol>
+      <div className="prose"><h3 className="sumh">In short</h3></div>
+      <div className="vs" role="table" aria-label="Today vs Blockflow">
+        <div className="th" role="columnheader">Today</div><div className="th" role="columnheader">Blockflow</div>
+        <div role="cell">The process lives in your head.</div><div role="cell">The process is on screen, step by step.</div>
+        <div role="cell">You see the price of one click, not of the whole campaign.</div><div role="cell">The whole plan shows its price before the first step runs.</div>
+        <div role="cell">A wrong format gets paid twice.</div><div role="cell">A quick check catches it first.</div>
+        <div role="cell">The team only sees the result.</div><div role="cell">The team compares whole directions.</div>
+      </div>
+    </section>
+
+    <section id="insights" className="sec" aria-labelledby="ipf-h">
+      <div className="prose"><div className="eyebrow">5</div><h2 id="ipf-h" className="h">From insight to principle to feature</h2></div>
+      <div className="tscroll card-t" tabIndex="0" role="region" aria-label="Insight, principle and feature table">
+        <table className="ipf">
+          <thead><tr><th scope="col">Insight</th><th scope="col">Principle</th><th scope="col">Feature in Blockflow</th></tr></thead>
+          <tbody>${IPF.map(r => html`<tr key=${r[1]}><td>${r[0]}</td><th scope="row">${r[1]}</th><td>${r[2]} <a className="jump" href=${'#' + r[3]} onClick=${e => { e.preventDefault(); goTo(r[3]); }}>${r[4]} ↓</a></td></tr>`)}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="decisions" className="sec" aria-labelledby="dec-h">
+      <div className="prose"><div className="eyebrow">6</div><h2 id="dec-h" className="h">Key design decisions and trade-offs</h2></div>
+      <div className="decs">${DECISIONS.map(d => html`<article key=${d.t} className="card dec">
+        <h3>${d.t}</h3><p>${d.p}</p>
+        ${d.ph ? html`<${Ph} id=${d.ph[0]} name=${d.ph[1]} ratio=${d.ph[2]}/>` : null}
+      </article>`)}</div>
+    </section>
+
+    <section id="solution" className="sec" aria-labelledby="sol-h">
+      <div className="prose"><div className="eyebrow">7</div><h2 id="sol-h" className="h">The solution in four moments</h2></div>
+      <div className="moments">${MOMENTS.map((m, i) => html`<article key=${i} id=${'moment-' + (i + 1)} className=${'moment' + (i % 2 ? ' flip' : '')}>
+        <div className="mtext"><h3>${m.t}</h3><p>${m.p}</p>
+          <button className="btn" onClick=${() => show(i + 1)}>Show me in the demo ↓</button></div>
+        <${Ph} id=${m.ph[0]} name=${m.ph[1]} ratio=${m.ph[2]}/>
+      </article>`)}</div>
+    </section>
   </main>`;
+}
+
+function DemoIntro({onStart, onTour, reset}){
+  return html`<div id="demo" className="band">
+    <div><div className="eyebrow">8 · Try it yourself</div><h2 className="h">Try it with flowers.</h2><p className="cap" style=${{margin:'4px 0 0'}}>Concept prototype. Images are flower placeholders and prices are samples.</p></div>
+    <div className="ctas"><button className="btn btn-primary btn-lg" onClick=${onStart}>Try it in 3 steps</button><button className="btn btn-lg" onClick=${onTour}>Full tour</button><button className="btn btn-ghost" onClick=${reset}>Reset demo</button></div>
+  </div>`;
+}
+
+function CaseBottom(){
+  return html`<div className="wrap cs cs-end">
+    <section id="learnings" className="sec prose" aria-labelledby="next-h">
+      <div className="eyebrow">9</div>
+      <h2 id="next-h" className="h">What I'd explore next</h2>
+      <ul className="list">
+        <li><b>Real prices.</b> How sample prices would map onto live model rates that change every month, and how to show “about” honestly.</li>
+        <li><b>More checks.</b> Beyond format: resolution vs. brief, number of stills vs. brief, missing inputs upstream (the exact case that cost one Freepik user 10,500 credits).</li>
+        <li><b>Output.</b> How the campaign deck gets exported or shared with a client.</li>
+        <li><b>Longer, non-linear jobs.</b> Where the across/down grid breaks, and whether a “branch” block is enough or a real graph is needed.</li>
+      </ul>
+    </section>
+    <section className="sec prose" aria-labelledby="learn-h">
+      <div className="eyebrow">10</div>
+      <h2 id="learn-h" className="h">What I learned</h2>
+      <ol className="learned">
+        <li><b>Check your assumptions against the real tools.</b> I started out sure that nobody shows prices up front. The research showed me the real gap was one level higher, and the concept got sharper for it.</li>
+        <li><b>The best feature can be a constraint.</b> Allowing only one button to spend money made everything else feel safe to explore.</li>
+        <li><b>Competitors can disagree, and both be right.</b> FLORA hides prices and I show them. Seeing why they chose that helped me explain why I didn't.</li>
+        <li><b>Static tools vs. a dynamic process.</b> Most platforms I looked at are built statically: one step, one screen, one result. Blockflow feels dynamic because the creative process moves in two directions, steps across and alternatives down, and you always keep an overview of what you're making, including the price.</li>
+      </ol>
+    </section>
+    <footer className="site-foot">
+      <p className="cap">Concept prototype. Images are flower placeholders and prices are samples.</p>
+      <p className="cap">Blockflow is a personal concept and isn't affiliated with any tool mentioned.</p>
+      <details className="sources">
+        <summary>Sources</summary>
+        <ul>${SOURCES.map(s => html`<li key=${s[1]}><a href=${s[1]} target="_blank" rel="noopener noreferrer">${s[0]}<span className="sr"> (opens in a new tab)</span></a></li>`)}
+          <li className="cap"><${Todo}>add the docs links behind the comparison table (research.md §2)<//></li>
+          <li className="cap"><${Todo}>add the link to Runway's published credit rate<//></li>
+        </ul>
+      </details>
+      <nav className="pager" aria-label="Portfolio">
+        <a href="#" className="phlink" title="Placeholder link" onClick=${e => e.preventDefault()}>← Back to portfolio</a>
+        <a href="#" className="phlink" title="Placeholder link" onClick=${e => e.preventDefault()}>Next project: Routine App →</a>
+      </nav>
+      <p className="cap"><${Todo}>add the portfolio and Routine App links<//></p>
+    </footer>
+  </div>`;
+}
+
+/* soft outline that follows an element for 2 seconds */
+function FlashRing({target, onDone}){
+  const rect = useTarget(target);
+  useEffect(() => { const t = setTimeout(onDone, 2200); return () => clearTimeout(t); }, [target]);
+  if (!rect) return null;
+  return html`<div className="flashring" aria-hidden="true" style=${{top:(rect.top - 8) + 'px', left:(rect.left - 8) + 'px', width:(rect.width + 16) + 'px', height:(rect.height + 16) + 'px'}}></div>`;
+}
+
+/* sticky mini-nav: highlights the section in view */
+const NAV = [['overview','Overview'],['research','Research'],['insights','Insights'],['decisions','Decisions'],['solution','Demo'],['learnings','Learnings']];
+function MiniNav(){
+  const [cur, setCur] = useState('overview');
+  useEffect(() => {
+    const on = () => {
+      const y = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--topbar-h')) || 60) + 40;
+      let c = 'overview';
+      NAV.forEach(([id]) => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top <= y) c = id; });
+      const demo = document.getElementById('demo');
+      if (demo && demo.getBoundingClientRect().top <= y) { const l = document.getElementById('learnings'); c = l && l.getBoundingClientRect().top <= y ? 'learnings' : 'solution'; }
+      setCur(c);
+    };
+    on(); window.addEventListener('scroll', on, {passive:true}); return () => window.removeEventListener('scroll', on);
+  }, []);
+  return html`<nav className="nav" aria-label="Case study sections">${NAV.map(([id, l]) => html`<a key=${id} href=${'#' + id} aria-current=${cur === id ? 'location' : null} onClick=${e => { e.preventDefault(); goTo(id); }}>${l}</a>`)}</nav>`;
 }
 
 /* ---------------- flow ---------------- */
@@ -1061,7 +1763,7 @@ function Flow({f, S, A, dnd, $, isTop, hint}){
   const status = kept ? '★ Team pick' : (f.from ? 'Remix of ' + f.from : (isTop ? 'Latest' : ''));
   return html`<section className=${'flow' + (isTop ? ' top' : '') + (kept ? ' kept' : '')} aria-label=${f.name} data-tour=${tourKey + '-flow'}>
     <div className="flow-head">
-      <h3 className="h">${f.name}</h3>
+      <h4 className="h">${f.name}</h4>
       ${status ? html`<span className="cap">${status}</span>` : null}
       <div className="flow-tools">
         ${f.votes.length ? html`<span className="voters" title=${'Votes: ' + f.votes.map(p => PEOPLE[p].name).join(', ')}>${f.votes.map(p => html`<span key=${p} className="av" style=${{background: PEOPLE[p].bg, color: PEOPLE[p].fg}}>${p}</span>`)}</span>` : null}
@@ -1266,7 +1968,7 @@ function Deck({f, d, r, S, A, dnd, $, tourKey}){
   return html`<article className=${'deck' + (drop ? ' drop' : '')} aria-label=${f.name + ' campaign deck'} onDragOver=${dnd.over(key)} onDragLeave=${dnd.leave(key)} onDrop=${dnd.drop(f.id, null)} data-tour=${tourKey + '-deck'}>
     <div className="deck-head">
       <span className="itile"><${Icon} n="deck" s=${17}/></span>
-      <h4 className="h" style=${{flex:1}}>Campaign deck</h4>
+      <h5 className="h" style=${{flex:1}}>Campaign deck</h5>
       <span className="num" style=${{fontWeight:700}}>${$(r.proj)}</span>
     </div>
     ${f.blocks.length === 0 ? html`<p className="cap" style=${{margin:0}}>Your finished stills and Reel will show up here.</p>` : html`<${React.Fragment}>
@@ -1622,5 +2324,6 @@ function Tour({S, setS, A}){
 ReactDOM.createRoot(document.getElementById('app')).render(html`<${App}/>`);
 })();
 </script>
+
 </body>
 </html>
