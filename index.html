@@ -418,6 +418,8 @@ button:disabled{cursor:default}
 .btn-lg{min-height:52px;padding:0 24px;border-radius:14px}
 .btn-icon{width:var(--tap);padding:0}
 .btn-wide{width:100%}
+.btn-again{border-color:var(--line-2);box-shadow:var(--shadow-1)}
+.btn-again:hover{border-color:var(--ink-3)}
 .btn-quiet{background:var(--field);border-color:transparent;color:var(--ink-2)}
 .btn:disabled{opacity:1;background:var(--field);color:var(--ink-3);border:1px dashed var(--line-2);box-shadow:none;transform:none}
 .linkbtn{background:none;border:none;padding:0 4px;min-height:var(--tap);font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
@@ -2407,7 +2409,7 @@ function Block({f, b, idx, info, S, A, $, tourKey, isNext}){
   const priceText = info.cost ? (est ? '≈ ' : '') + $(info.cost) : 'Free';
   const label = b.busy ? 'Working…' : (locked ? info.lockText : (b.type === 'prompt' ? (b.ran ? 'Send again' : 'Send prompt') : (b.ran ? 'Run again' : 'Run')));
   const cta = isNext && !locked && !b.busy;
-  const cls = 'btn btn-wide ' + (cta ? 'btn-primary cta' : (b.ran ? 'btn-ghost' : ''));
+  const cls = 'btn btn-wide ' + (cta ? 'btn-primary cta' : (b.ran ? 'btn-again' : ''));
 
   return html`<article className=${'block' + (b.busy ? ' busy' : '')} aria-label=${t.title} data-tour=${tk}>
     <div className="bhead">
