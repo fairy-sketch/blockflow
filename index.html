@@ -663,10 +663,15 @@ table{border-collapse:collapse}
 .cmp tbody th{font-size:var(--fs-body);font-weight:600;white-space:nowrap;position:sticky;left:0;background:var(--panel)}
 .cmp tr.mine td,.cmp tr.mine th{background:var(--field)}
 .cmp tr.mine th{box-shadow:inset 3px 0 0 var(--ink)}
-.mk{display:inline-flex;width:16px;justify-content:center;margin-right:6px;font-weight:700}
-.mk.yes{color:var(--ink)}
-.mk.part{color:var(--ink-2)}
-.mk.no{color:var(--ink-3)}
+.mk{display:inline-flex;width:16px;flex:none;justify-content:center;margin-right:6px;font-weight:700}
+.mk.yes{color:#17692D}
+.mk.part{color:#7A4E00}
+.mk.no{color:#A1271F}
+.pill{display:inline-flex;align-items:flex-start;padding:4px 10px 4px 6px;border-radius:8px;background:#F1F1EF;color:var(--ink);line-height:1.35}
+.pill.yes{background:#E2F3E5}
+.pill.part{background:#FDF0D5}
+.pill.no{background:#FBE5E2}
+.legend .pill{padding:3px 10px 3px 6px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .ph{display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;border:1.5px dashed var(--line-2);border-radius:var(--r);background:color-mix(in srgb, var(--panel) 45%, transparent);color:var(--ink-2);font-size:var(--fs-cap);font-weight:600;letter-spacing:.02em;width:100%;max-width:100%}
 .todo{display:inline-block;border:1.5px dashed var(--line-2);border-radius:6px;padding:1px 8px;color:var(--ink-2);font-size:var(--fs-cap)}
@@ -1498,7 +1503,8 @@ function CmpCell({v, i}){
   const bold = v[0] === '*', t = v.replace(/^\*/, '');
   if (i < 3) return i === 0 ? html`<th scope="row">${bold ? html`<b>${t}</b>` : t}</th>` : html`<td>${t}</td>`;
   const m = mark(v);
-  return html`<td><span className=${'mk ' + (m === '✓' ? 'yes' : m === '~' ? 'part' : 'no')} aria-hidden="true">${m}</span>${bold ? html`<b>${t}</b>` : t}</td>`;
+  const k = m === '✓' ? 'yes' : m === '~' ? 'part' : m ? 'no' : '';
+  return html`<td><span className=${'pill ' + k}>${m ? html`<span className=${'mk ' + k} aria-hidden="true">${m}</span>` : null}${bold ? html`<b>${t}</b>` : t}</span></td>`;
 }
 
 const PAINS = [
@@ -1590,7 +1596,7 @@ function CaseTop({onStart, show}){
         <p>I spent time in the tools I'd actually use for this kind of work, both the node canvases and the prompt boxes. For each one I asked the same five questions: does it show the cost before I run, the cost of the whole plan, whether my output matches the brief, whether I can compare directions, and whether my team sees the steps or only the result.</p>
       </div>
       <div className="tablecard">
-        <div className="legend cap" aria-label="Legend"><span><span className="mk yes" aria-hidden="true">✓</span>yes</span><span><span className="mk part" aria-hidden="true">~</span>partly</span><span><span className="mk no" aria-hidden="true">–</span>not found</span></div>
+        <div className="legend cap" aria-label="Legend"><span className="pill yes"><span className="mk yes" aria-hidden="true">✓</span>yes</span><span className="pill part"><span className="mk part" aria-hidden="true">~</span>partly</span><span className="pill no"><span className="mk no" aria-hidden="true">–</span>not found</span></div>
         <div className="tscroll" tabIndex="0" role="region" aria-label="Comparison table, scrolls sideways">
           <table className="cmp">
             <caption className="sr">How the tools compare on pricing, checks, comparing directions and team view</caption>
