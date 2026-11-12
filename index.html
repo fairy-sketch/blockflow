@@ -990,6 +990,42 @@ a{color:var(--ink)}
 @media (prefers-reduced-motion: reduce){
   .vis *,.vis *::before,.vis *::after{transition:none!important;animation:none!important}
 }
+/* cost patterns */
+.pt-wrap{display:flex;flex-direction:column;gap:16px}
+.pt-h{margin:0;font-size:var(--fs-h);letter-spacing:-.01em}
+.pt-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pt-card{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;min-width:0}
+.pt-card.best{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.pt-art{background:var(--canvas);border-bottom:1px solid var(--line);padding:20px;min-height:236px;display:flex;align-items:center;justify-content:center}
+.pt-art>div{width:100%;max-width:360px}
+.pt-ui{display:flex;flex-direction:column;gap:8px;font-size:13px}
+.pt-tool{display:flex;align-items:center;gap:10px;padding:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-1)}
+.pt-tool .v-tile{width:44px;flex:none}
+.pt-prompt{flex:1;padding:8px 10px;border-radius:9px;background:var(--field);color:var(--ink-2);font-size:13px}
+.pt-gen{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 6px 6px 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.pt-gen.faint{opacity:.72}
+.pt-step{font-weight:600;font-size:13px}
+.pt-art .btn{pointer-events:none}
+.pt-btn{min-height:32px;padding:0 12px;font-size:13px;border-radius:9px}
+.pt-q{text-align:center;font-weight:700;font-size:14px;color:var(--ink-2);padding-top:4px}
+.pt-nodes{display:flex;align-items:center}
+.pt-nodes .v-wire{width:12px}
+.pt-node{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-1)}
+.pt-nl{font-weight:600;font-size:12px}
+.pt-tag{align-self:flex-start;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--field-2)}
+.pt-bub{align-self:flex-start;max-width:88%;padding:9px 12px;border-radius:14px 14px 14px 4px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-1);line-height:1.4}
+.pt-bub.me{align-self:flex-end;border-radius:14px 14px 4px 14px;background:var(--field-2);box-shadow:none;border-color:transparent}
+.pt-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px}
+.pt-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pt-top h4{margin:0;font-size:18px;letter-spacing:-.01em}
+.pt-n{width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--on-accent);display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
+.pt-dl{margin:0;display:flex;flex-direction:column;gap:6px}
+.pt-dl>div{display:grid;grid-template-columns:82px 1fr;gap:8px}
+.pt-dl dt{font-size:var(--fs-cap);font-weight:600;color:var(--ink-2);padding-top:2px}
+.pt-dl dd{margin:0;font-size:var(--fs-body)}
+.pt-tools{margin:0;font-size:var(--fs-cap);color:var(--ink-2)}
+.pt-tools span{font-weight:600;margin-right:4px}
+@media (max-width:760px){.pt-grid{grid-template-columns:1fr}.pt-art{min-height:0}}
 </style>
 
 <div id="app"></div>
@@ -1976,6 +2012,53 @@ function Asset({ph}){
   const C = ASSETS[ph[0]];
   return C ? html`<${C}/>` : html`<${Ph} id=${ph[0]} name=${ph[1]} ratio=${ph[2]}/>`;
 }
+/* how tools show cost today: four patterns, drawn as plain mini interfaces */
+function PatGen({p, faint}){
+  return html`<div className=${'pt-gen' + (faint ? ' faint' : '')}><span className="pt-step">${p[0]}</span><span className="btn btn-primary pt-btn">${p[1]}</span></div>`;
+}
+function PatUI({k}){
+  if (k === 'click') return html`<div className="pt-ui">
+    <div className="pt-tool"><${VT} seed=${5}/><div className="pt-prompt">pink tulips, golden hour</div></div>
+    <${PatGen} p=${['Image', 'Generate · $0.26']}/>
+    <${PatGen} p=${['Upscale', 'Generate · $0.40']} faint=${true}/>
+    <${PatGen} p=${['Video', 'Generate · $1.15']} faint=${true}/>
+    <div className="pt-q">Whole campaign: ?</div>
+  </div>`;
+  if (k === 'node') return html`<div className="pt-ui">
+    <div className="pt-nodes">${[['Image', '$0.26'], ['Upscale', '$0.40'], ['Video', '$1.15']].map((n, j) => html`<${React.Fragment} key=${j}>
+      <div className="pt-node"><${VT} seed=${5} v=${j ? 3 : 0}/><span className="pt-nl">${n[0]}</span><span className="pt-tag num">${n[1]}</span></div>${j < 2 ? html`<span className="v-wire"></span>` : null}<//>`)}</div>
+    <div className="pt-q">Plan total: ?</div>
+  </div>`;
+  if (k === 'none') return html`<div className="pt-ui">
+    <div className="pt-nodes">${[2, 5, 9].map((s, j) => html`<${React.Fragment} key=${s}><div className="pt-node"><${VT} seed=${s}/><span className="pt-nl">${['Image', 'Image', 'Video'][j]}</span></div>${j < 2 ? html`<span className="v-wire"></span>` : null}<//>`)}</div>
+    <div className="pt-gen"><span className="pt-step">Run all</span><span className="btn btn-primary pt-btn">Generate</span></div>
+  </div>`;
+  return html`<div className="pt-ui">
+    <div className="pt-bub me">6 stills, an upscale and a 9:16 reel, please.</div>
+    <div className="pt-bub">Here's the plan: Image → Upscale → Video.<br/><b className="num">About $4.86.</b> Build it?</div>
+    <div className="pt-gen"><span className="pt-step">Nothing built yet</span><span className="btn btn-primary pt-btn">Build</span></div>
+  </div>`;
+}
+const PATTERNS = [
+  {k:'click', t:'Price on each button', see:'What one click costs.', miss:'What the whole campaign will cost.', tools:['Figma Weave', 'Higgsfield', 'Leonardo']},
+  {k:'node', t:'Price on each step of a canvas', see:'What each step costs.', miss:'A total for the plan. You add it up yourself.', tools:['Magnific Spaces']},
+  {k:'none', t:'No price at all', see:'Only the pictures. Calmer, no small money decisions.', miss:'Any sense of what it costs.', tools:['FLORA, since May 2026']},
+  {k:'plan', t:'Cost before building', see:'The cost of the plan before anything runs.', miss:null, tools:['Krea Node Agent'], best:true}
+];
+function PatternGrid(){
+  return html`<div className="pt-wrap">
+    <h3 className="pt-h">Four ways tools show cost today</h3>
+    <div className="pt-grid">${PATTERNS.map((p, j) => html`<article key=${p.k} className=${'pt-card' + (p.best ? ' best' : '')} aria-labelledby=${'pt-' + p.k}>
+      <div className="pt-art" role="img" aria-label=${'Sketch: ' + p.t + '. ' + p.see + (p.miss ? ' Missing: ' + p.miss : '')}><div aria-hidden="true"><${PatUI} k=${p.k}/></div></div>
+      <div className="pt-body">
+        <div className="pt-top"><span className="pt-n num">${j + 1}</span><h4 id=${'pt-' + p.k}>${p.t}</h4>${p.best ? html`<span className="v-chip">Closest to Blockflow</span>` : null}</div>
+        <dl className="pt-dl"><div><dt>You see</dt><dd>${p.see}</dd></div>${p.miss ? html`<div><dt>Missing</dt><dd>${p.miss}</dd></div>` : null}</dl>
+        <p className="pt-tools"><span>Seen in</span> ${p.tools.join(' · ')}</p>
+      </div>
+    </article>`)}</div>
+    <p className="cap">Sketches of the pattern, not screenshots of the tools. Prices are Blockflow's samples.</p>
+  </div>`;
+}
 
 function CaseTop({onStart, show}){
   return html`<main id="overview" className="wrap cs">
@@ -2050,7 +2133,7 @@ function CaseTop({onStart, show}){
         <p><b>Where the gap is.</b> Showing the price up front isn't the problem. letz.ai does it, and that's what I like about it: it shows what a generation costs, not just a token count. Higgsfield, Leonardo, Magnific Spaces and Figma Weave put the cost on the Run or Generate button too. My problem starts when I think in pipelines and mix different steps and models together. The gap is one level up. Every tool prices <b>the click</b>. I couldn't find one that prices <b>the plan</b> before the first step runs. Krea's Node Agent is the closest: it shows a cost before it builds a workflow. None of them checks a step against the brief before it spends.</p>
         <p>FLORA went the other way. In May 2026 it dropped credits and took the price tag off every model card, because <a href=${FLORA_URL} target="_blank" rel="noopener noreferrer">“credits made every generation a small financial decision, and creative work doesn't survive that.”<span className="sr"> (FLORA blog, opens in a new tab)</span></a> I think they're right about the problem. Blockflow is my bet on a different answer: <b>one price for the whole plan, shown once, before you start</b>, instead of many small prices, or none.</p>
       </div>
-      <div className="grid3">${COMP.map(c => html`<${CompSketch} key=${c[0]} c=${c}/>`)}</div>
+      <${PatternGrid}/>
     </section>
 
     <section className="sec" aria-labelledby="pain-h">
