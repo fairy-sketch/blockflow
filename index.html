@@ -817,6 +817,179 @@ a{color:var(--ink)}
   .jar{margin-left:auto}
   .coach{left:16px!important;right:16px;bottom:max(16px, env(safe-area-inset-bottom,0px));top:auto!important;width:auto}
 }
+/* case study visuals: same tokens, blocks, tiles and buttons as the demo */
+.vis{position:relative;width:100%;overflow:hidden;border-radius:var(--r);background:var(--canvas);border:1px solid var(--line)}
+.vis-in{position:absolute;left:0;top:0;transform-origin:0 0;font:14px/1.35 var(--font-ui);color:var(--ink)}
+.vis .num{font-variant-numeric:tabular-nums}
+.v-strip{position:absolute;left:0;right:0;bottom:0;height:48px;display:flex;align-items:center;padding:0 22px;background:var(--panel);border-top:1px solid var(--line);font-weight:600;font-size:16px}
+.v-two{position:absolute;inset:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.v-two.pp{bottom:66px}
+.v-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-1)}
+.v-col{display:flex;flex-direction:column;gap:10px;padding:14px;min-width:0}
+.v-lab{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.v-capt{margin-top:auto;font-weight:600;font-size:15px}
+.v-axis{font-size:12px;color:var(--ink-2)}
+.v-muted{color:var(--ink-2);font-size:12px}
+.v-blk{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:7px;box-shadow:var(--shadow-1);min-width:0}
+.v-bh{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink)}
+.v-bh svg{color:var(--ink-2)}
+.v-tile{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--field);min-width:0}
+.v-tile.v-deck{aspect-ratio:4/5;outline:1px solid var(--line-2);outline-offset:2px}
+.v-heart{position:absolute;right:4px;top:4px;width:20px;height:20px;border-radius:50%;background:var(--panel);color:var(--ink-3);display:grid;place-items:center;box-shadow:var(--shadow-1);transition:color .3s ease, transform .3s ease}
+.v-heart.on{color:var(--ink);transform:scale(1.12)}
+.v-wire{flex:none;width:10px;height:2px;border-radius:2px;background:var(--ink)}
+.v-row{display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;background:var(--field)}
+.v-row.dim{opacity:.45}
+.v-rh{display:flex;justify-content:space-between;font-size:13px;font-weight:600}
+.v-star{font-size:12px}
+.v-tiles{display:flex;align-items:center;gap:4px}
+.v-tiles .v-tile{flex:1}
+.v-tiles .v-tile.v-deck{flex:1.25}
+.v-tiles3{display:flex;gap:6px;flex:1}
+.v-tiles3 .v-tile{flex:1}
+.v-free{flex:none;font-size:11px;font-weight:600;color:var(--ink-2);background:var(--field-2);border-radius:6px;padding:2px 7px}
+.v-field{display:flex;align-items:center;gap:6px;min-height:32px;padding:0 10px;border-radius:10px;background:var(--field);font-size:12px;font-weight:600;flex:1}
+.v-field svg{margin-left:auto;color:var(--ink-2)}
+.v-seg{display:flex;padding:3px;border-radius:10px;background:var(--field);font-size:12px;font-weight:600;color:var(--ink-2);flex:1}
+.v-seg span{flex:1;text-align:center;padding:6px 4px;border-radius:8px;transition:background .5s ease, color .5s ease, box-shadow .5s ease}
+.v-seg span.on{background:var(--panel);color:var(--ink);box-shadow:var(--shadow-1)}
+.v-ghost{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:12px;font-weight:600;transition:background .3s ease, transform .2s ease}
+.v-chip{display:inline-flex;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;background:var(--field-2);color:var(--ink)}
+.vis .btn{pointer-events:none}
+.vis .v-sm{min-height:30px;padding:0 12px;font-size:12px;border-radius:9px}
+.v-link{font-size:12px;font-weight:600;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.v-in{opacity:0;transform:translateY(8px);transition:opacity .6s ease, transform .6s ease}
+.v-in.on{opacity:1;transform:none}
+.v-check{border:1.5px solid var(--ink);border-radius:12px;background:var(--panel);padding:10px;display:flex;flex-direction:column;gap:8px}
+.v-ct{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.v-ca{display:flex;align-items:center;gap:12px}
+.v-price{font-size:13px;font-weight:700;text-align:right}
+.v-txt{display:flex;flex-direction:column;gap:5px;padding:6px 2px;aspect-ratio:1;justify-content:center}
+.v-txt span{height:6px;border-radius:3px;background:var(--field-2)}
+.v-txt span:nth-child(2){width:80%}
+.v-txt span:nth-child(3){width:55%}
+.v-jar{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;background:var(--panel);border:1px solid var(--line)}
+.v-bar{display:flex;height:10px;border-radius:5px;background:var(--field-2);overflow:hidden}
+.v-bar .sp{background:var(--ink)}
+.v-bar .pl{background:var(--ink-3);opacity:.55;transition:width .9s ease}
+.v-jl{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:13px;font-weight:700}
+.v-jl i{display:block;font-style:normal;font-weight:500;font-size:11px;color:var(--ink-2)}
+.v-jl .hl{text-decoration:underline;text-underline-offset:3px}
+
+/* D1 */
+.v-graph{position:relative;flex:1;min-height:0}
+.v-graph svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.v-graph path{fill:none;stroke:var(--ink-3);stroke-width:1.2;opacity:.55}
+.v-node{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-size:11px;font-weight:600;padding:3px 7px;border-radius:7px;background:var(--panel);border:1px solid var(--line-2);box-shadow:var(--shadow-1)}
+
+/* D2 */
+.d2{position:absolute;inset:0}
+.d2-blk{position:absolute;left:28px;top:28px;width:330px;padding:12px;gap:10px}
+.d2-line{display:flex;align-items:center;gap:10px}
+.d2-run{display:flex;margin-top:4px}
+.vis .v-run{min-height:46px;font-size:15px;width:100%;animation:glow 2.6s ease-in-out infinite}
+.d2-arrow{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.d2-arrow path{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.d2-note{position:absolute;left:400px;top:150px;font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.2;transform:rotate(-3deg)}
+
+/* D3 */
+.d3-screen{position:relative;flex:1;border-radius:10px;overflow:hidden;background:var(--field)}
+.d3-skel{position:absolute;inset:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.d3-skel span{border-radius:8px;background:var(--panel)}
+.d3-mask{position:absolute;inset:0;background:var(--mask)}
+.d3-modal{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:78%;background:var(--panel);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow-2)}
+.d3-mt{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700}
+.d3-f{display:flex;flex-direction:column;gap:3px}
+.d3-f i{font-style:normal;font-size:11px;color:var(--ink-2)}
+.d3-f span{height:24px;border-radius:7px;border:1px solid var(--line-2)}
+.d3-blk{flex:1}
+.d3-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden}
+.d3-frame svg.art,.m3-frame svg.art{position:absolute;inset:0}
+
+/* M1 */
+.m-head{position:absolute;left:24px;right:24px;top:20px;display:flex;justify-content:space-between;align-items:baseline}
+.v-name{font-size:18px;font-weight:700;letter-spacing:-.01em}
+.m-total{font-size:26px;letter-spacing:-.02em}
+.m-total.v-in{transform:translateY(40px)}
+.m-total.v-in.on{transform:none}
+.m1-row{position:absolute;left:24px;right:24px;top:64px;display:flex;align-items:center}
+.m1-blk{flex:1}
+.m1-w{width:8px;margin:0 2px}
+.m1-jar{position:absolute;left:24px;right:24px;top:228px}
+
+/* M2 */
+.m2{position:absolute;left:24px;right:24px;top:22px;bottom:66px;display:grid;grid-template-columns:1.25fr 1fr;gap:16px;align-items:start}
+.m2-mood{padding:12px}
+.m2-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.m2-go{font-weight:600}
+.m2-price{padding:14px;display:flex;flex-direction:column;gap:14px}
+.m2-tot{display:flex;justify-content:space-between;align-items:baseline}
+.m2-tot b{font-size:28px;letter-spacing:-.02em}
+
+/* M3 */
+.m3{position:absolute;inset:0}
+.m3-blk{position:absolute;left:28px;top:24px;width:280px;padding:12px}
+.m3-stage{height:200px;display:grid;place-items:center;background:var(--field);border-radius:10px}
+.m3-frame{position:relative;width:240px;height:135px;border-radius:8px;overflow:hidden;transition:width 1s ease, height 1s ease}
+.m3-frame.tall{width:110px;height:196px}
+.m3-ok{position:absolute;right:6px;bottom:6px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--on-accent);display:grid;place-items:center}
+.m3-seg{flex:none}
+.m3-check{position:absolute;left:330px;top:120px;width:282px;opacity:0;transform:translateX(30px);transition:opacity .6s ease, transform .6s ease}
+.m3-check.on{opacity:1;transform:none}
+.btn.press{transform:scale(.94)}
+.v-cursor{position:absolute;opacity:0;transition:left 1.2s ease, top 1.2s ease, opacity .4s ease}
+.v-cursor.on{opacity:1}
+
+/* M4 */
+.m4{position:absolute;left:24px;right:24px;top:18px;bottom:62px;display:flex;flex-direction:column;gap:8px}
+.m4-bar{display:flex;align-items:center;gap:10px;height:32px}
+.m4-remix.on{background:var(--field-2)}
+.m4-pop{font-size:12px;font-weight:600;padding:6px 10px;border-radius:9px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow-2)}
+.m4-r{padding:8px 10px;flex-direction:row;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line)}
+.m4-r .v-rh{display:contents}
+.m4-r .v-rh>span{width:70px;flex:none;order:0}
+.m4-r .v-tiles{flex:1;order:1;max-width:290px}
+.m4-r .v-rh>b{order:2;margin-left:auto;font-size:18px;width:70px;text-align:right}
+.m4-r .v-tile{border-radius:6px}
+.m4-r .v-tiles .v-tile.v-deck{flex:0 0 40px}
+.m4-r .v-tiles .v-tile{flex:0 0 34px}
+.v-slide{opacity:0;transform:translateY(-24px);transition:opacity .7s ease, transform .7s ease}
+.v-slide.on{opacity:1;transform:none}
+.m4-tots{position:absolute;right:-6px;top:36px;width:88px;height:218px;border:1.5px solid var(--ink);border-radius:12px;opacity:0;transition:opacity .6s ease}
+.m4-tots.on{opacity:1}
+
+/* Price the plan */
+.pp-gen{display:flex;align-items:center;gap:8px}
+.pp-gen .v-tile{width:40px;flex:none}
+.pp-prompt{min-height:28px}
+.pp-q{margin-top:auto;font-size:15px;font-weight:700;color:var(--ink-3)}
+
+/* C1–C6 */
+.csk{margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.csk figcaption{display:flex;flex-direction:column;gap:2px;font-size:var(--fs-body)}
+.c-wf{position:absolute;inset:40px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;align-content:center}
+.c-wf .v-wire{width:34px;height:3px}
+.c-n{width:130px;height:96px;border-radius:16px;background:var(--panel);border:1.5px solid var(--line-2);box-shadow:var(--shadow-1);display:flex;align-items:flex-end;justify-content:center;padding:10px}
+.c-n.dash{background:transparent;border-style:dashed}
+.c-n .v-chip{font-size:18px;padding:4px 12px}
+.vis .c-btn{min-height:64px;padding:0 26px;font-size:24px;border-radius:16px;flex-basis:auto}
+.c-wf>.c-btn{margin-top:6px}
+.c-q{flex-basis:100%;text-align:center;font-size:22px;font-weight:600;color:var(--ink-3)}
+.c-flora .c-card{width:150px;display:flex;flex-direction:column;gap:10px;padding:10px;background:var(--panel);border-radius:16px;border:1.5px solid var(--line);box-shadow:var(--shadow-1)}
+.c-flora .v-tile{border-radius:10px}
+.c-bar{height:12px;border-radius:6px;background:var(--field-2);width:70%}
+.c-agent{flex-direction:column;flex-wrap:nowrap}
+.c-bub{font-size:24px;font-weight:700;padding:14px 22px;border-radius:18px 18px 18px 4px;background:var(--panel);border:1.5px solid var(--ink);box-shadow:var(--shadow-1)}
+.c-ghosts{display:flex;align-items:center;gap:10px}
+.c-ghosts .c-n{width:110px;height:76px}
+.c-gen{flex-direction:column;flex-wrap:nowrap}
+.c-prompt{width:100%;min-height:110px;flex:none;flex-direction:column;align-items:stretch;justify-content:center;gap:12px;padding:0 22px;border-radius:16px}
+.c-prompt span{height:12px;border-radius:6px;background:var(--field-2)}
+.c-prompt span+span{width:60%}
+
+@media (prefers-reduced-motion: reduce){
+  .vis *,.vis *::before,.vis *::after{transition:none!important;animation:none!important}
+}
 </style>
 
 <div id="app"></div>
@@ -1513,7 +1686,7 @@ const PAINS = [
   {t:'A wrong format gets paid twice.', p:'The most common and most avoidable mistake: the video comes out 16:9 when the brief needs 9:16.', q:['q2','q1'], callout:true},
   {t:'Expensive steps run on things you weren’t sold on.', p:'People already work around this by hand: cheap first, expensive only for the keepers.', q:['q11']},
   {t:'Multi-step canvases fail silently.', p:'', q:['q9']},
-  {t:'The team only sees the result.', p:'Directions get compared as finished images, not as the steps and costs behind them. If the whole team could see the process, and not only the output, they could think along and get more involved instead of just reacting to a result.', q:[], todo:'add a quote or observation for pain 6, if you have one'}
+  {t:'The team only sees the result.', p:'Directions get compared as finished images, not as the steps and costs behind them. If the whole team could see the process, and not only the output, they could think along and get more involved instead of just reacting to a result.', q:[]}
 ];
 const IPF = [
   ['A campaign is a chain, but tools show one step','Show the process','Blocks run left to right: Moodboard → Prompt → Image → Upscale → Video → Sound → Deck', 'demo', 'Try it in the demo'],
@@ -1525,7 +1698,7 @@ const IPF = [
 const DECISIONS = [
   {t:'Node graph vs. “work across, compare down.”', p:'Node canvases are powerful, but every wire is a decision, and two directions turn into spaghetti. I chose a stricter grid: steps always go left to right, and alternatives always stack downward. I lose freedom (no loops, no wiring one output into three places). I gain a layout where anyone can read a flow in seconds and compare directions row by row. For campaign work, which is mostly linear, I think the trade is worth it. I didn’t start from a node sketch: the layout came straight from the way I described my wish to my friend, a pipeline you read across and directions you compare down.', ph:['D1','Node graph vs. across/down grid, before/after sketch','16:10']},
   {t:'One button that spends.', p:'Every other control is free to touch: models, versions, formats, presets. Only Run spends, and it always says how much (“Run · $1.58”). This is the decision I weighed hardest against FLORA’s “hide the price” approach. Hiding the price lowers the stress of each click. Showing it once, on the one button that matters, lowers the stress of the whole project.', ph:['D2','The one Run button that spends, sketch','4:3']},
-  {t:'Price the plan, not just the click.', p:'Every block shows “about $x” before it runs. The flow sums it, and the credit jar shows planned vs. left. The cost is a design material you can shape, not a bill that arrives later.'},
+  {t:'Price the plan, not just the click.', p:'Every block shows “about $x” before it runs. The flow sums it, and the credit jar shows planned vs. left. The cost is a design material you can shape, not a bill that arrives later.', ph:['PP','Price per click vs. price per plan','16:10']},
   {t:'A check, not a wall.', p:'The quick check shows up only before expensive steps, gives one clear fix (“Switch to 9:16”), and always offers “Make it anyway” and “Don’t ask again”. It should feel like a friend looking over your shoulder, not a form.', ph:['D3','Quick check: blocking form vs. friendly check, before/after','16:10']},
   {t:'Sample prices and flower placeholders.', p:'I deliberately didn’t wire real models or real prices. Real prices change monthly, and the point of the concept is the shape of the decision, not the exact number. The flowers keep it light and stop people judging image quality instead of the flow.'},
   {t:'Guided tours in two lengths.', p:'A 3-step tour for people skimming a portfolio, and a 14-step tour for people who want every detail. Portfolio visitors skim, so the short one gets them to the point in about 20 seconds, while the long one is there for anyone who wants to see how deep it goes.'}
@@ -1536,6 +1709,273 @@ const MOMENTS = [
   {t:'Moment 3. Check before you spend.', p:'Before the video step: “Quick check before you spend $1.15. Format is 16:9. The brief needs 9:16.” One tap on “Switch to 9:16” and the mistake never costs anything.', ph:['M3','GIF, Quick check: switching to 9:16','16:10']},
   {t:'Moment 4. Compare whole directions.', p:'Remix Flow A into Flow C. Flows stack down, each with its total, so the team compares directions, not just pictures.', ph:['M4','GIF, Remix: flows stacking down','16:10']}
 ];
+
+/* ---------------- case study visuals (drawn with Blockflow's own pieces) ---------------- */
+const REDUCED = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function useStep(n, ms){
+  const ref = useRef(null);
+  const [i, setI] = useState(REDUCED() ? n - 1 : 0);
+  useEffect(() => {
+    if (REDUCED() || typeof IntersectionObserver === 'undefined') return;
+    let t = null;
+    const stop = () => { if (t) clearInterval(t); t = null; };
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { if (!t) { setI(0); t = setInterval(() => setI(x => (x + 1) % n), ms); } }
+      else stop();
+    }), {threshold:0.3});
+    if (ref.current) io.observe(ref.current);
+    return () => { stop(); io.disconnect(); };
+  }, []);
+  return [ref, i];
+}
+function Stage({r, label, k, strip, children}){
+  r = r || '16:10';
+  const W = r === '4:3' ? 560 : 640, H = r === '4:3' ? 420 : 400;
+  const box = useRef(null);
+  const [s, setS] = useState(0.5);
+  useLayoutEffect(() => {
+    const el = box.current; if (!el) return;
+    const f = () => setS(el.clientWidth / W);
+    f();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(f); ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const setRef = el => { box.current = el; if (k) k.current = el; };
+  return html`<div ref=${setRef} className="vis" role="img" aria-label=${label} style=${{aspectRatio: r.replace(':', ' / ')}}>
+    <div className="vis-in" aria-hidden="true" style=${{width:W + 'px', height:H + 'px', transform:'scale(' + s + ')'}}>
+      ${children}
+      ${strip ? html`<div className="v-strip">${strip}</div>` : null}
+    </div>
+  </div>`;
+}
+function VHeart({on}){
+  return html`<span className=${'v-heart' + (on ? ' on' : '')}><svg viewBox="0 0 24 24" width="12" height="12"><path d=${HEART} fill=${on ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2.2"/></svg></span>`;
+}
+function VT({seed, v, heart, i, cls}){
+  return html`<div className=${'v-tile' + (cls ? ' ' + cls : '')}><${Flower} k=${{i: i == null ? 2 : i, seed, v: v || 0}}/>${heart != null ? html`<${VHeart} on=${heart}/>` : null}</div>`;
+}
+function VB({ic, t, children, cls, style}){
+  return html`<div className=${'v-blk' + (cls ? ' ' + cls : '')} style=${style}>
+    <div className="v-bh"><${Icon} n=${ic} s=${13}/><span>${t}</span></div>${children}</div>`;
+}
+function VRow({seed, name, total, star, dim, n, cls, style}){
+  const N = n || 4;
+  return html`<div className=${'v-row' + (dim ? ' dim' : '') + (cls ? ' ' + cls : '')} style=${style}>
+    <div className="v-rh"><span>${name}${star ? html` <span className="v-star">★</span>` : null}</span><b className="num">${total}</b></div>
+    <div className="v-tiles">${range(N).map(j => html`<${React.Fragment} key=${j}><${VT} seed=${seed} v=${j ? 3 : 0}/><span className="v-wire"></span><//>`)}<${VT} seed=${seed} v=${3} cls="v-deck"/></div>
+  </div>`;
+}
+function VJar({planned}){
+  return html`<div className="v-jar">
+    <div className="v-bh"><${Icon} n="jar" s=${13}/><span>Credit jar</span></div>
+    <div className="v-bar"><span className="sp" style=${{width:(5.85 / 24.75 * 100) + '%'}}></span><span className="pl" style=${{width:(planned ? 0.49 / 24.75 * 100 : 0) + '%'}}></span></div>
+    <div className="v-jl num">
+      <span><i>This month</i>$24.75</span><span><i>Spent</i>$5.85</span>
+      <span className=${planned ? 'hl' : ''}><i>Planned</i>${planned ? '$0.49' : '$0.00'}</span><span><i>Left</i>${planned ? '$18.41' : '$18.90'}</span>
+    </div>
+  </div>`;
+}
+function Free(){ return html`<span className="v-free">free</span>`; }
+
+/* D1 */
+const G_NODES = [['Brief',48,24],['Moodboard',150,18],['Prompt',236,34],['Prompt v2',58,84],['Image v1',160,80],['Seed tweak',238,104],['Image v3',92,142],['Upscale',206,152],['Video 16:9',52,202],['Video 9:16',152,212],['Sound',240,214],['Deck',150,262]];
+const G_WIRES = [[0,1],[0,3],[1,4],[2,4],[3,6],[2,5],[5,6],[4,7],[6,7],[7,8],[7,9],[4,8],[9,10],[8,11],[10,11],[1,3],[6,11],[5,9],[3,8]];
+function wirePath(a, b, j){
+  const [, x1, y1] = G_NODES[a], [, x2, y2] = G_NODES[b];
+  const bend = (j % 2 ? 1 : -1) * (30 + (j * 7) % 40);
+  return 'M' + x1 + ' ' + y1 + ' C ' + (x1 + bend) + ' ' + (y1 + 45) + ', ' + (x2 - bend) + ' ' + (y2 - 45) + ', ' + x2 + ' ' + y2;
+}
+function VisD1(){
+  return html`<${Stage} label="Before and after: a tangled node graph of twelve steps, next to Blockflow's grid with Flow A at $4.86 across and Flow B at $2.10 stacked below">
+    <div className="v-two">
+      <div className="v-card v-col">
+        <div className="v-lab">Before · Node graph</div>
+        <div className="v-graph">
+          <svg viewBox="0 0 288 280" preserveAspectRatio="none">${G_WIRES.map((w, j) => html`<path key=${j} d=${wirePath(w[0], w[1], j)}/>`)}</svg>
+          ${G_NODES.map(nd => html`<span key=${nd[0]} className="v-node" style=${{left:(nd[1] / 288 * 100) + '%', top:(nd[2] / 280 * 100) + '%'}}>${nd[0]}</span>`)}
+        </div>
+        <div className="v-capt">Powerful, but every wire is a decision.</div>
+      </div>
+      <div className="v-card v-col">
+        <div className="v-lab">After · Across, then down</div>
+        <div className="v-axis">Steps, left to right →</div>
+        <${VRow} seed=${3} name="Flow A" star=${true} total="$4.86"/>
+        <${VRow} seed=${11} name="Flow B" total="$2.10" dim=${true}/>
+        <div className="v-axis">↓ Alternatives to compare</div>
+      </div>
+    </div>
+  <//>`;
+}
+
+/* D2 */
+function VisD2(){
+  return html`<${Stage} r="4:3" label="One Image block: the model picker, hearts, presets and Remix are all marked free. Only the black Run · $1.58 button spends.">
+    <div className="d2">
+      <${VB} ic="stills" t="Image" cls="d2-blk">
+        <div className="d2-line"><div className="v-tiles3">${[0,1,2].map(j => html`<${VT} key=${j} seed=${5} v=${j} heart=${j !== 1}/>`)}</div><${Free}/></div>
+        <div className="d2-line"><div className="v-field">GPT Image 2 <span className="v-muted num">$0.26 each</span> <${Icon} n="chev" s=${12}/></div><${Free}/></div>
+        <div className="d2-line"><div className="v-seg"><span>Visual first</span><span className="on">Balanced</span><span>Lean</span></div><${Free}/></div>
+        <div className="d2-line"><span className="v-ghost"><${Icon} n="remix" s=${13}/> Remix</span><${Free}/></div>
+        <div className="d2-run"><span className="btn btn-primary v-run">Run · $1.58</span></div>
+      <//>
+      <svg className="d2-arrow" viewBox="0 0 560 420"><path d="M462 214 C 480 268, 440 312, 372 322"/><path d="M386 311 L 371 322 L 387 333"/></svg>
+      <div className="d2-note">The only thing<br/>that spends.</div>
+    </div>
+  <//>`;
+}
+
+/* D3 */
+function VisD3(){
+  return html`<${Stage} label="Before: a dimmed screen with a blocking error form. After: the Video block stays visible with a short note, Format is 16:9, the brief needs 9:16, and a Switch to 9:16 button.">
+    <div className="v-two">
+      <div className="v-card v-col">
+        <div className="v-lab">Before</div>
+        <div className="d3-screen">
+          <div className="d3-skel"><span></span><span></span><span></span><span></span></div>
+          <div className="d3-mask"></div>
+          <div className="d3-modal">
+            <div className="d3-mt"><${Icon} n="warn" s=${14}/> Error: invalid format</div>
+            <div className="d3-f"><i>Format *</i><span></span></div>
+            <div className="d3-f"><i>Duration *</i><span></span></div>
+            <span className="btn btn-primary v-sm">OK</span>
+          </div>
+        </div>
+        <div className="v-capt">A wall.</div>
+      </div>
+      <div className="v-card v-col">
+        <div className="v-lab">After</div>
+        <${VB} ic="motion" t="Video" cls="d3-blk">
+          <div className="d3-frame"><${Flower} k=${{i:2, seed:7, v:0}}/></div>
+        <//>
+        <div className="v-check">
+          <div className="v-ct"><${Icon} n="warn" s=${13}/> Format is 16:9. The brief needs 9:16.</div>
+          <div className="v-ca"><span className="btn btn-primary v-sm">Switch to 9:16</span><span className="v-link">Don't ask again</span></div>
+        </div>
+        <div className="v-capt">A check.</div>
+      </div>
+    </div>
+  <//>`;
+}
+
+/* M1 */
+const M1_ITEMS = [['mood','Moodboard','$0.99'],['prompt','Prompt','$0.01'],['stills','Image','$2.11'],['up','Upscale','$0.40'],['motion','Video','$1.15'],['sound','Sound','$0.20']];
+function VisM1(){
+  const [k, i] = useStep(10, 1800);
+  return html`<${Stage} k=${k} label="Animation: in Flow A, each block shows its price one by one, the flow total of $4.86 rises to the header and the credit jar fills its planned part. Nothing runs." strip="Every price shows before anything runs.">
+    <div className="m-head"><span className="v-name">Flow A <span className="v-star">★</span></span><b className=${'m-total num v-in' + (i >= 7 ? ' on' : '')}>$4.86</b></div>
+    <div className="m1-row">${M1_ITEMS.map((it, j) => html`<${React.Fragment} key=${j}>
+      <${VB} ic=${it[0]} t=${it[1]} cls="m1-blk">
+        ${it[0] === 'prompt' ? html`<div className="v-txt"><span></span><span></span><span></span></div>` : html`<${VT} seed=${3} v=${j > 2 ? 3 : 0}/>`}
+        <div className=${'v-price num v-in' + (i >= j + 1 ? ' on' : '')}>${it[2]}</div>
+      <//>${j < 5 ? html`<span className="v-wire m1-w"></span>` : null}<//>`)}</div>
+    <div className="m1-jar"><${VJar} planned=${i >= 8}/></div>
+  <//>`;
+}
+
+/* M2 */
+const M2_HEARTS = [0, 2, 5, 7];
+function VisM2(){
+  const [k, i] = useStep(9, 1800);
+  const lean = i >= 6;
+  return html`<${Stage} k=${k} label="Animation: four flower ideas in the moodboard get a heart one by one, then the Play with the price preset switches from Balanced to Lean and the flow total drops to $1.48." strip="Explore cheap, finish well.">
+    <div className="m2">
+      <${VB} ic="mood" t="Moodboard" cls="m2-mood">
+        <div className="m2-grid">${range(8).map(j => html`<${VT} key=${j} seed=${4 + j} i=${j} heart=${M2_HEARTS.indexOf(j) > -1 && i > M2_HEARTS.indexOf(j)}/>`)}</div>
+        <div className=${'v-muted m2-go v-in' + (i >= 5 ? ' on' : '')}>4 ♥ go to Image</div>
+      <//>
+      <div className="v-card m2-price">
+        <div className="v-bh"><${Icon} n="price" s=${13}/><span>Play with the price</span></div>
+        <div className="v-seg"><span>Visual first</span><span className=${lean ? '' : 'on'}>Balanced</span><span className=${lean ? 'on' : ''}>Lean</span></div>
+        <div className="m2-tot"><span className="v-muted">Flow total</span><b className=${'num v-in' + (i >= 7 ? ' on' : '')}>$1.48</b></div>
+        <div className=${'m2-save v-in' + (i >= 7 ? ' on' : '')}><span className="v-chip">Save $0.20</span></div>
+      </div>
+    </div>
+  <//>`;
+}
+
+/* M3 */
+function VisM3(){
+  const [k, i] = useStep(7, 1900);
+  const tall = i >= 4;
+  return html`<${Stage} k=${k} label="Animation: a Video block shows a 16:9 frame, a quick check slides in saying the brief needs 9:16, a tap on Switch to 9:16 reshapes the frame to vertical and a check mark appears." strip="Caught before it cost anything.">
+    <div className="m3">
+      <${VB} ic="motion" t="Video" cls="m3-blk">
+        <div className="m3-stage"><div className=${'m3-frame' + (tall ? ' tall' : '')}><${Flower} k=${{i:2, seed:7, v:0}}/>
+          <span className=${'m3-ok v-in' + (i >= 5 ? ' on' : '')}><${Icon} n="check" s=${14} w=${2.6}/></span></div></div>
+        <div className="v-seg m3-seg"><span className=${tall ? 'on' : ''}>9:16</span><span>1:1</span><span className=${tall ? '' : 'on'}>16:9</span></div>
+        <div className="v-muted num">Kling · $1.15 each</div>
+      <//>
+      <div className=${'v-check m3-check' + (i >= 1 && i < 4 ? ' on' : '')}>
+        <div className="v-muted">Quick check before you spend $1.15</div>
+        <div className="v-ct"><${Icon} n="warn" s=${13}/> Format is 16:9. The brief needs 9:16.</div>
+        <div className="v-ca"><span className=${'btn btn-primary v-sm' + (i === 3 ? ' press' : '')}>Switch to 9:16</span><span className="v-link">Don't ask again</span></div>
+      </div>
+      <svg className=${'v-cursor' + (i >= 2 && i < 4 ? ' on' : '')} style=${i >= 2 ? {left:'386px', top:'198px'} : {left:'560px', top:'330px'}} viewBox="0 0 24 24" width="26" height="26"><path d="M5 3l14 8-6 1.6L10 19z" fill="var(--ink)" stroke="var(--panel)" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    </div>
+  <//>`;
+}
+
+/* M4 */
+function VisM4(){
+  const [k, i] = useStep(7, 1900);
+  return html`<${Stage} k=${k} label="Animation: Flow A at $4.86 sits on top, Remix is tapped, Flow B at $2.10 slides in below it, then Flow C at $4.86, and the three totals line up on the right." strip="Compare whole directions, not single images.">
+    <div className="m4">
+      <div className="m4-bar"><span className=${'v-ghost m4-remix' + (i >= 1 ? ' on' : '')}><${Icon} n="remix" s=${13}/> Remix</span>
+        <span className=${'m4-pop v-in' + (i === 1 || i === 2 ? ' on' : '')}>Remix into a new flow</span></div>
+      <div className=${'m4-tots' + (i >= 4 ? ' on' : '')}></div>
+      <${VRow} seed=${3} name="Flow A" star=${true} total="$4.86" n=${5} cls="m4-r"/>
+      <${VRow} seed=${11} name="Flow B" total="$2.10" n=${5} cls=${'m4-r v-slide' + (i >= 2 ? ' on' : '')}/>
+      <${VRow} seed=${17} name="Flow C" total="$4.86" n=${5} cls=${'m4-r v-slide' + (i >= 3 ? ' on' : '')}/>
+    </div>
+  <//>`;
+}
+
+/* Price the plan */
+function VisPP(){
+  return html`<${Stage} label="Left: separate Generate buttons, each with its own price, and a total shown as a question mark. Right: Flow A priced up front at $4.86, with the credit jar: this month $24.75, spent $5.85, planned $0.49, left $18.41." strip="You see the price of one click, not of the whole campaign.">
+    <div className="v-two pp">
+      <div className="v-card v-col">
+        <div className="v-lab">Price per click</div>
+        ${[['$0.08', 4], ['$0.26', 6], ['$1.15', 7]].map(g => html`<div key=${g[0]} className="pp-gen"><${VT} seed=${g[1]}/><div className="v-field pp-prompt"></div><span className="btn btn-primary v-sm">Generate · ${g[0]}</span></div>`)}
+        <div className="pp-q">Total: ?</div>
+      </div>
+      <div className="v-card v-col">
+        <div className="v-lab">Price per plan</div>
+        <${VRow} seed=${3} name="Flow A" star=${true} total="$4.86"/>
+        <${VJar} planned=${true}/>
+      </div>
+    </div>
+  <//>`;
+}
+
+/* C1–C6: pattern sketches, never screenshots */
+function CWire({kind}){
+  if (kind === 'run') return html`<div className="c-wf"><div className="c-n"></div><span className="v-wire"></span><div className="c-n"></div><span className="btn btn-primary c-btn">Run · price</span></div>`;
+  if (kind === 'nodes') return html`<div className="c-wf c-nodes">${[0,1,2].map(j => html`<${React.Fragment} key=${j}><div className="c-n"><span className="v-chip">price</span></div>${j < 2 ? html`<span className="v-wire"></span>` : null}<//>`)}<span className="c-q">plan total: ?</span></div>`;
+  if (kind === 'flora') return html`<div className="c-wf c-flora">${[2,5,9].map(s => html`<div key=${s} className="c-card"><${VT} seed=${s}/><span className="c-bar"></span></div>`)}<span className="c-q">no price shown</span></div>`;
+  if (kind === 'agent') return html`<div className="c-wf c-agent"><span className="c-bub">Cost before building</span><div className="c-ghosts"><div className="c-n dash"></div><span className="v-wire"></span><div className="c-n dash"></div><span className="v-wire"></span><div className="c-n dash"></div></div></div>`;
+  return html`<div className="c-wf c-gen"><div className="v-field c-prompt"><span></span><span></span></div><span className="btn btn-primary c-btn">Generate · ${kind === 'tok' ? 'tokens' : 'credits'}</span></div>`;
+}
+const COMP = [
+  ['C1','Figma Weave','The price sits on the Run button, per click.','run'],
+  ['C2','Magnific Spaces','A powerful node canvas where the price shows per node, not for the plan.','nodes'],
+  ['C3','FLORA','Removed credits and prices in May 2026, which is calmer but leaves you blind to cost.','flora'],
+  ['C4','Krea Node Agent','The closest: it shows the cost before building.','agent'],
+  ['C5','Higgsfield','Credits on the Generate button.','gen'],
+  ['C6','Leonardo','The token cost on the button.','tok']
+];
+function CompSketch({c}){
+  return html`<figure className="csk">
+    <${Stage} label=${'Pattern sketch of ' + c[1] + ': ' + c[2]}><${CWire} kind=${c[3]}/><//>
+    <figcaption><b>${c[1]}</b><span>${c[2]}</span><span className="cap">Pattern sketch, not a screenshot</span></figcaption>
+  </figure>`;
+}
+const ASSETS = {D1:VisD1, D2:VisD2, D3:VisD3, M1:VisM1, M2:VisM2, M3:VisM3, M4:VisM4, PP:VisPP};
+function Asset({ph}){
+  const C = ASSETS[ph[0]];
+  return C ? html`<${C}/>` : html`<${Ph} id=${ph[0]} name=${ph[1]} ratio=${ph[2]}/>`;
+}
 
 function CaseTop({onStart, show}){
   return html`<main id="overview" className="wrap cs">
@@ -1610,14 +2050,7 @@ function CaseTop({onStart, show}){
         <p><b>Where the gap is.</b> Showing the price up front isn't the problem. letz.ai does it, and that's what I like about it: it shows what a generation costs, not just a token count. Higgsfield, Leonardo, Magnific Spaces and Figma Weave put the cost on the Run or Generate button too. My problem starts when I think in pipelines and mix different steps and models together. The gap is one level up. Every tool prices <b>the click</b>. I couldn't find one that prices <b>the plan</b> before the first step runs. Krea's Node Agent is the closest: it shows a cost before it builds a workflow. None of them checks a step against the brief before it spends.</p>
         <p>FLORA went the other way. In May 2026 it dropped credits and took the price tag off every model card, because <a href=${FLORA_URL} target="_blank" rel="noopener noreferrer">“credits made every generation a small financial decision, and creative work doesn't survive that.”<span className="sr"> (FLORA blog, opens in a new tab)</span></a> I think they're right about the problem. Blockflow is my bet on a different answer: <b>one price for the whole plan, shown once, before you start</b>, instead of many small prices, or none.</p>
       </div>
-      <div className="grid3">
-        <${Ph} id="C1" name="Figma Weave, Run button with price, annotated" ratio="16:10"/>
-        <${Ph} id="C2" name="Magnific Spaces, node canvas, annotated" ratio="16:10"/>
-        <${Ph} id="C3" name="FLORA canvas, annotated" ratio="16:10"/>
-        <${Ph} id="C4" name="Krea Node Agent, cost before building, annotated" ratio="16:10"/>
-        <${Ph} id="C5" name="Higgsfield, Generate button with credits, annotated" ratio="16:10"/>
-        <${Ph} id="C6" name="Leonardo, token cost on the button, annotated" ratio="16:10"/>
-      </div>
+      <div className="grid3">${COMP.map(c => html`<${CompSketch} key=${c[0]} c=${c}/>`)}</div>
     </section>
 
     <section className="sec" aria-labelledby="pain-h">
@@ -1630,7 +2063,7 @@ function CaseTop({onStart, show}){
             ${p.p ? html`<p>${p.p}</p>` : null}
             ${p.q.map(k => html`<${QuoteCard} key=${k} q=${Q[k]}/>`)}
             ${p.todo ? html`<p className="cap"><${Todo}>${p.todo}<//></p>` : null}
-            ${p.callout ? html`<div className="callout"><b>Cost of the mistake.</b> At Runway's published rate (12 credits per second), a 10-second clip made twice costs 240 credits, which is 38% of a Standard plan's month. <span className="cap"><${Todo}>add the link to Runway's published rate<//></span></div>` : null}
+            ${p.callout ? html`<div className="callout"><b>Cost of the mistake.</b> At Runway's published rate (12 credits per second), a 10-second clip made twice costs 240 credits, which is 38% of a Standard plan's month. <a href="https://help.runwayml.com/hc/en-us/articles/15124877443219-How-do-credits-work" target="_blank" rel="noopener noreferrer" className="qlink">Source<${ExtIcon}/><span className="sr"> (Runway Help Center, opens in a new tab)</span></a></div>` : null}
           </div>
         </li>`)}
       </ol>
@@ -1658,7 +2091,7 @@ function CaseTop({onStart, show}){
       <div className="prose"><div className="eyebrow">6</div><h2 id="dec-h" className="h">Key design decisions and trade-offs</h2></div>
       <div className="decs">${DECISIONS.map(d => html`<article key=${d.t} className="card dec">
         <h3>${d.t}</h3><p>${d.p}</p>
-        ${d.ph ? html`<${Ph} id=${d.ph[0]} name=${d.ph[1]} ratio=${d.ph[2]}/>` : null}
+        ${d.ph ? html`<${Asset} ph=${d.ph}/>` : null}
       </article>`)}</div>
     </section>
 
@@ -1667,7 +2100,7 @@ function CaseTop({onStart, show}){
       <div className="moments">${MOMENTS.map((m, i) => html`<article key=${i} id=${'moment-' + (i + 1)} className=${'moment' + (i % 2 ? ' flip' : '')}>
         <div className="mtext"><h3>${m.t}</h3><p>${m.p}</p>
           <button className="btn" onClick=${() => show(i + 1)}>Show me in the demo ↓</button></div>
-        <${Ph} id=${m.ph[0]} name=${m.ph[1]} ratio=${m.ph[2]}/>
+        <${Asset} ph=${m.ph}/>
       </article>`)}</div>
     </section>
   </main>`;
@@ -1709,7 +2142,7 @@ function CaseBottom(){
         <summary>Sources</summary>
         <ul>${SOURCES.map(s => html`<li key=${s[1]}><a href=${s[1]} target="_blank" rel="noopener noreferrer">${s[0]}<span className="sr"> (opens in a new tab)</span></a></li>`)}
           <li className="cap"><${Todo}>add the docs links behind the comparison table (research.md §2)<//></li>
-          <li className="cap"><${Todo}>add the link to Runway's published credit rate<//></li>
+          <li><a href="https://help.runwayml.com/hc/en-us/articles/15124877443219-How-do-credits-work" target="_blank" rel="noopener noreferrer">Runway Help Center, How do credits work?<span className="sr"> (opens in a new tab)</span></a></li>
         </ul>
       </details>
     </footer>
